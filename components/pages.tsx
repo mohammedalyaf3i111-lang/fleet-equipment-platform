@@ -1,8 +1,9 @@
 ﻿import Link from "next/link";
 import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
-import { AlertTriangle, ArrowLeft, BrickWall, CircleGauge, Construction, Container, Download, Droplets, Eye, Factory, FileCheck2, Forklift, Fuel, Gauge, Mail, Mountain, Printer, Route, Send, Shield, ShieldCheck, ToyBrick, Truck, Waves } from "lucide-react";
-import { HomeHero, EquipmentCategoriesSection, PopularServicesSection, HowItWorksSection, WasteHighlightSection, WhyChooseUsSection, StatsStripSection, SupplierCtaSection } from "@/components/home-sections";
+import { AlertTriangle, ArrowLeft, BadgeCheck, BrickWall, CircleGauge, Construction, Container, Download, Droplets, Eye, Factory, FileCheck2, Forklift, Fuel, Gauge, Headphones, Mail, Mountain, Printer, Route, Send, Shield, ShieldCheck, ToyBrick, Truck, Users, Waves } from "lucide-react";
+import { EquipmentCategoriesSection, PopularServicesSection, HowItWorksSection, WasteHighlightSection, WhyChooseUsSection, StatsStripSection, SupplierCtaSection } from "@/components/home-sections";
+import { HeroImage } from "@/components/hero-image";
 import { EquipmentMarketplace } from "@/components/equipment-marketplace";
 import { RequestEquipmentForm } from "@/components/request-equipment-form";
 import { SupplierStepper } from "@/components/supplier-stepper";
@@ -43,10 +44,70 @@ import {
   supplierOperationActions
 } from "@/lib/operation-contracts";
 
+function Hero() {
+  const trustIndicators = [
+    { label: "عقود رقمية موثقة", icon: FileCheck2 },
+    { label: "مزودون معتمدون", icon: BadgeCheck },
+    { label: "حماية وتشغيل احترافي", icon: ShieldCheck },
+    { label: "دعم فني متكامل", icon: Headphones }
+  ];
+  const heroStats = [
+    { value: "+500", label: "مزود معتمد", icon: Users },
+    { value: "+2500", label: "معدة متنوعة", icon: Truck },
+    { value: "+1500", label: "عميل وشركة", icon: BadgeCheck },
+    { value: "+50", label: "مدينة داخل المملكة", icon: ShieldCheck }
+  ];
+  return (
+    <section className="relative isolate min-h-[700px] overflow-hidden bg-navy text-white md:min-h-[780px]">
+      <HeroImage />
+      <div className="absolute inset-0 z-[1] bg-[linear-gradient(90deg,rgba(7,22,42,0.70)_0%,rgba(7,22,42,0.66)_33%,rgba(7,22,42,0.42)_55%,rgba(7,22,42,0.14)_78%,rgba(7,22,42,0.06)_100%)]" />
+      <div className="absolute inset-0 z-[2] bg-[radial-gradient(circle_at_72%_42%,rgba(255,255,255,0.08),transparent_22%),radial-gradient(circle_at_50%_50%,transparent_48%,rgba(2,8,18,0.58)_100%)]" />
+      <div className="absolute inset-0 z-[3] bg-[linear-gradient(180deg,rgba(3,10,20,0.02),rgba(3,10,20,0.72))]" />
+      <div className="relative z-10 mx-auto flex min-h-[700px] max-w-7xl items-center px-4 pb-40 pt-[clamp(90px,12vh,140px)] sm:px-6 md:min-h-[780px] md:pb-44 lg:px-8">
+        <div className="hero-rise mr-auto max-w-2xl translate-y-3 rounded-2xl border border-white/10 bg-navy/10 p-0 text-right shadow-2xl shadow-black/20 backdrop-blur-[1px] sm:translate-y-6 lg:max-w-3xl lg:translate-y-8">
+          <p className="mb-5 inline-flex rounded-md border border-gold/45 bg-white/10 px-4 py-2 text-sm font-semibold text-gold shadow-2xl backdrop-blur">
+            منصة سعودية لإدارة تأجير المعدات
+          </p>
+          <h1 className="max-w-3xl text-4xl font-extrabold leading-[1.16] text-white drop-shadow-2xl sm:text-5xl lg:text-6xl">
+            منصة فليت معدات<br />لتأجير المعدات<br />وإدارة الأساطيل
+          </h1>
+          <p className="mt-6 max-w-2xl text-lg font-medium leading-9 text-white/84 sm:text-xl">
+            حل احترافي يربط ملاك المعدات بالمقاولين والشركات<br className="hidden sm:block" />
+            مع عقود رقمية وتشغيل متكامل..
+          </p>
+          <div className="mt-9 flex flex-wrap gap-3">
+            <ButtonLink href="/request-equipment">اطلب معدة الآن</ButtonLink>
+            <ButtonLink href="/become-supplier" variant="secondary">سجل كمزود معدات</ButtonLink>
+          </div>
+          <div className="hero-rise-delay mt-8 grid max-w-3xl gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {trustIndicators.map(({ label, icon: Icon }) => (
+              <div key={label} className="group rounded-xl border border-white/16 bg-white/[0.11] px-4 py-4 text-sm font-semibold text-white shadow-2xl shadow-black/20 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-gold/65 hover:bg-white/[0.16]">
+                <Icon className="mb-3 h-5 w-5 text-gold transition group-hover:scale-110" />
+                {label}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="absolute inset-x-4 bottom-5 z-10 mx-auto max-w-7xl sm:bottom-8 sm:px-2">
+        <div className="grid overflow-hidden rounded-2xl border border-white/16 bg-white/[0.13] shadow-2xl shadow-black/30 backdrop-blur-2xl sm:grid-cols-2 lg:grid-cols-4">
+          {heroStats.map(({ value, label, icon: Icon }) => (
+            <div key={label} className="group border-white/12 px-5 py-5 text-right transition duration-300 hover:bg-white/[0.08] sm:border-l">
+              <Icon className="mb-3 h-5 w-5 text-gold transition group-hover:scale-110" />
+              <p className="text-3xl font-extrabold text-gold">{value}</p>
+              <p className="mt-1 text-sm font-semibold text-white/82">{label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function HomePage() {
   return (
     <PublicShell>
-      <HomeHero />
+      <Hero />
       <EquipmentCategoriesSection />
       <PopularServicesSection />
       <HowItWorksSection />
