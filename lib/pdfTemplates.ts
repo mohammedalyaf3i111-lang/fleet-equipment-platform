@@ -3,7 +3,16 @@
  *
  * Client-side PDF generation using jsPDF + html2canvas.
  * All 7 legal document templates with Arabic-first content.
+ * Cairo font embedded as base64 for proper RTL/Arabic shaping.
  */
+
+import {
+  CAIRO_AR_400,
+  CAIRO_AR_700,
+  CAIRO_AR_900,
+  CAIRO_LA_400,
+  CAIRO_LA_700,
+} from "@/lib/_fontData";
 
 export const LEGAL_DISCLAIMER =
   "هذه النماذج أولية ويجب مراجعتها واعتمادها من مستشار قانوني مرخص داخل المملكة العربية السعودية قبل استخدامها تجاريًا.";
@@ -210,6 +219,48 @@ export function generateReferenceNumber(type: string): string {
   return `FE-${prefix}-${ts}-${rnd}`;
 }
 
+/** Inline font-face CSS with embedded Cairo base64 data */
+function getCairoFontCSS(): string {
+  return `
+@font-face {
+  font-family: 'Cairo';
+  src: url('data:font/woff2;base64,${CAIRO_AR_400}') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFF;
+}
+@font-face {
+  font-family: 'Cairo';
+  src: url('data:font/woff2;base64,${CAIRO_AR_700}') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFF;
+}
+@font-face {
+  font-family: 'Cairo';
+  src: url('data:font/woff2;base64,${CAIRO_AR_900}') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFF;
+}
+@font-face {
+  font-family: 'Cairo';
+  src: url('data:font/woff2;base64,${CAIRO_LA_400}') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+                 U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Cairo';
+  src: url('data:font/woff2;base64,${CAIRO_LA_700}') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+                 U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}`;
+}
+
 /** Build the full HTML document string for a legal document */
 export function buildDocumentHTML(
   template: LegalDocumentTemplate,
@@ -230,54 +281,61 @@ export function buildDocumentHTML(
   const partyName = formData.customerName || formData.supplierName || "—";
 
   const row = (label: string, value: string) =>
-    `<div style="display:flex;border-bottom:1px solid #E2E8F0;font-size:12px;">
-       <div style="padding:8px 12px;font-weight:700;color:#475569;width:42%;background:#F8FAFC;flex-shrink:0;">${label}</div>
-       <div style="padding:8px 12px;color:#0F172A;flex:1;">${value || "—"}</div>
+    `<div style="display:flex;border-bottom:1px solid #E2E8F0;font-size:12px;line-height:1.6;">
+       <div style="padding:9px 14px;font-weight:700;color:#475569;width:44%;background:#F8FAFC;flex-shrink:0;font-family:'Cairo',Tahoma,sans-serif;">${label}</div>
+       <div style="padding:9px 14px;color:#0F172A;flex:1;font-family:'Cairo',Tahoma,sans-serif;">${value || "—"}</div>
      </div>`;
 
   const sectionItem = (text: string, idx: number) =>
-    `<div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #F1F5F9;align-items:flex-start;">
-       <span style="color:#D8A31E;font-weight:900;font-size:13px;flex-shrink:0;margin-top:1px;">${idx + 1}.</span>
-       <span style="font-size:12px;line-height:1.75;color:#334155;">${text}</span>
+    `<div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #F1F5F9;align-items:flex-start;">
+       <span style="color:#D8A31E;font-weight:900;font-size:13px;flex-shrink:0;margin-top:2px;font-family:'Cairo',Tahoma,sans-serif;">${idx + 1}.</span>
+       <span style="font-size:12px;line-height:1.85;color:#334155;font-family:'Cairo',Tahoma,sans-serif;">${text}</span>
      </div>`;
 
   const attachItem = (num: string, label: string) =>
-    `<div style="display:flex;border-bottom:1px solid #E2E8F0;font-size:12px;">
-       <div style="padding:8px 12px;font-weight:700;color:#475569;width:42%;background:#F8FAFC;flex-shrink:0;">${num}. ${label}</div>
-       <div style="padding:8px 12px;color:#64748B;">&#9744; مرفق</div>
+    `<div style="display:flex;border-bottom:1px solid #E2E8F0;font-size:12px;line-height:1.6;">
+       <div style="padding:9px 14px;font-weight:700;color:#475569;width:44%;background:#F8FAFC;flex-shrink:0;font-family:'Cairo',Tahoma,sans-serif;">${num}. ${label}</div>
+       <div style="padding:9px 14px;color:#64748B;font-family:'Cairo',Tahoma,sans-serif;">&#9744; مرفق</div>
      </div>`;
+
+  const sectionHead = (text: string) =>
+    `<div style="font-size:11px;font-weight:800;color:#D8A31E;letter-spacing:0.5px;margin-bottom:12px;text-transform:uppercase;font-family:'Cairo',Tahoma,sans-serif;">${text}</div>`;
 
   return `<!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
 <meta charset="UTF-8"/>
 <style>
+  ${getCairoFontCSS()}
   * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-    font-size:13px;
-    color:#0F172A;
-    background:#fff;
-    width:794px;
-    direction:rtl;
+  body { background:#fff; }
+  .fe-doc {
+    font-family: 'Cairo', Tahoma, Arial, sans-serif;
+    font-size: 13px;
+    color: #0F172A;
+    background: #fff;
+    width: 794px;
+    direction: rtl;
+    line-height: 1.6;
   }
 </style>
 </head>
 <body>
+<div class="fe-doc">
 
 <!-- ═══ HEADER ═══ -->
 <div style="background:#07162A;color:#fff;padding:28px 36px;display:flex;justify-content:space-between;align-items:flex-start;">
   <div>
-    <div style="font-size:22px;font-weight:900;color:#D8A31E;letter-spacing:-0.5px;">فليت معدات</div>
-    <div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:3px;">Fleet Equipment Platform</div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;">منصة تأجير المعدات وإدارة الأساطيل — المملكة العربية السعودية</div>
+    <div style="font-size:22px;font-weight:900;color:#D8A31E;letter-spacing:-0.5px;font-family:'Cairo',Tahoma,sans-serif;">فليت معدات</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:3px;font-family:'Cairo',Tahoma,sans-serif;">Fleet Equipment Platform</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;font-family:'Cairo',Tahoma,sans-serif;">منصة تأجير المعدات وإدارة الأساطيل — المملكة العربية السعودية</div>
   </div>
   <div style="text-align:left;">
-    <div style="font-size:10px;color:rgba(255,255,255,0.5);">رقم المرجع / Reference No.</div>
-    <div style="font-size:13px;font-weight:700;color:#D8A31E;margin-top:3px;">${refNumber}</div>
-    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:8px;">تاريخ التوليد</div>
-    <div style="font-size:12px;font-weight:700;color:#fff;margin-top:2px;">${dateStr}</div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.65);">${timeStr}</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.5);font-family:'Cairo',Tahoma,sans-serif;">رقم المرجع / Reference No.</div>
+    <div style="font-size:13px;font-weight:700;color:#D8A31E;margin-top:3px;font-family:'Cairo',Tahoma,sans-serif;">${refNumber}</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:8px;font-family:'Cairo',Tahoma,sans-serif;">تاريخ التوليد</div>
+    <div style="font-size:12px;font-weight:700;color:#fff;margin-top:2px;font-family:'Cairo',Tahoma,sans-serif;">${dateStr}</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.65);font-family:'Cairo',Tahoma,sans-serif;">${timeStr}</div>
   </div>
 </div>
 
@@ -286,17 +344,17 @@ export function buildDocumentHTML(
 
 <!-- ═══ TITLE ═══ -->
 <div style="padding:22px 36px 16px;border-bottom:2px solid #F1F5F9;">
-  <div style="font-size:21px;font-weight:900;color:#07162A;">${template.titleAr}</div>
-  <div style="font-size:12px;color:#64748B;margin-top:4px;">${template.titleEn}</div>
+  <div style="font-size:21px;font-weight:900;color:#07162A;font-family:'Cairo',Tahoma,sans-serif;">${template.titleAr}</div>
+  <div style="font-size:12px;color:#64748B;margin-top:4px;font-family:'Cairo',Tahoma,sans-serif;">${template.titleEn}</div>
   <div style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;background:#FEF3C7;border:1px solid #FCD34D;border-radius:20px;padding:4px 12px;">
     <span style="font-size:10px;">&#9888;</span>
-    <span style="font-size:11px;font-weight:700;color:#92400E;">مسودة قانونية — يتطلب اعتماد قانوني قبل الاستخدام التجاري</span>
+    <span style="font-size:11px;font-weight:700;color:#92400E;font-family:'Cairo',Tahoma,sans-serif;">مسودة قانونية — يتطلب اعتماد قانوني قبل الاستخدام التجاري</span>
   </div>
 </div>
 
 <!-- ═══ PARTY DATA ═══ -->
 <div style="padding:16px 36px;border-bottom:1px solid #F1F5F9;">
-  <div style="font-size:11px;font-weight:800;color:#D8A31E;letter-spacing:0.5px;margin-bottom:10px;text-transform:uppercase;">بيانات الأطراف — Parties Information</div>
+  ${sectionHead("بيانات الأطراف — Parties Information")}
   <div style="border:1px solid #E2E8F0;border-radius:6px;overflow:hidden;">
     ${row("اسم العميل / Customer", formData.customerName)}
     ${row("اسم المورد / Supplier", formData.supplierName)}
@@ -307,7 +365,7 @@ export function buildDocumentHTML(
 
 <!-- ═══ EQUIPMENT DATA ═══ -->
 <div style="padding:16px 36px;border-bottom:1px solid #F1F5F9;">
-  <div style="font-size:11px;font-weight:800;color:#D8A31E;letter-spacing:0.5px;margin-bottom:10px;text-transform:uppercase;">بيانات المعدة والطلب — Equipment & Order Details</div>
+  ${sectionHead("بيانات المعدة والطلب — Equipment & Order Details")}
   <div style="border:1px solid #E2E8F0;border-radius:6px;overflow:hidden;">
     ${row("اسم المعدة / Equipment Name", formData.equipmentName)}
     ${row("رقم الطلب / Order Number", formData.orderNumber)}
@@ -320,7 +378,7 @@ export function buildDocumentHTML(
 
 <!-- ═══ TERMS & SECTIONS ═══ -->
 <div style="padding:16px 36px;border-bottom:1px solid #F1F5F9;">
-  <div style="font-size:11px;font-weight:800;color:#D8A31E;letter-spacing:0.5px;margin-bottom:12px;text-transform:uppercase;">بنود العقد والشروط الأساسية — Key Terms & Conditions</div>
+  ${sectionHead("بنود العقد والشروط الأساسية — Key Terms & Conditions")}
   ${template.sections.map((s, i) => sectionItem(s, i)).join("")}
 </div>
 
@@ -328,37 +386,37 @@ ${
   formData.notes
     ? `<!-- NOTES -->
 <div style="padding:16px 36px;border-bottom:1px solid #F1F5F9;">
-  <div style="font-size:11px;font-weight:800;color:#D8A31E;letter-spacing:0.5px;margin-bottom:10px;">ملاحظات إضافية — Additional Notes</div>
-  <div style="padding:12px 14px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;font-size:12px;line-height:1.75;color:#334155;">${formData.notes}</div>
+  ${sectionHead("ملاحظات إضافية — Additional Notes")}
+  <div style="padding:14px 16px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:6px;font-size:12px;line-height:1.85;color:#334155;font-family:'Cairo',Tahoma,sans-serif;">${formData.notes}</div>
 </div>`
     : ""
 }
 
 <!-- ═══ SIGNATURES ═══ -->
 <div style="padding:16px 36px;border-bottom:1px solid #F1F5F9;">
-  <div style="font-size:11px;font-weight:800;color:#D8A31E;letter-spacing:0.5px;margin-bottom:12px;text-transform:uppercase;">توقيعات الأطراف — Signatures</div>
+  ${sectionHead("توقيعات الأطراف — Signatures")}
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
     <div style="border:1px solid #CBD5E1;border-radius:6px;padding:16px;background:#F8FAFC;">
-      <div style="font-size:11px;font-weight:800;color:#64748B;margin-bottom:8px;">${template.party1Label}</div>
+      <div style="font-size:11px;font-weight:800;color:#64748B;margin-bottom:8px;font-family:'Cairo',Tahoma,sans-serif;">${template.party1Label}</div>
       <div style="border-bottom:1px dashed #94A3B8;height:44px;margin-bottom:8px;"></div>
-      <div style="font-size:11px;color:#94A3B8;">التوقيع والختم</div>
-      <div style="font-size:11px;color:#94A3B8;margin-top:8px;">التاريخ: _______ / _______ / _______</div>
+      <div style="font-size:11px;color:#94A3B8;font-family:'Cairo',Tahoma,sans-serif;">التوقيع والختم</div>
+      <div style="font-size:11px;color:#94A3B8;margin-top:8px;font-family:'Cairo',Tahoma,sans-serif;">التاريخ: _______ / _______ / _______</div>
     </div>
     <div style="border:1px solid #CBD5E1;border-radius:6px;padding:16px;background:#F8FAFC;">
-      <div style="font-size:11px;font-weight:800;color:#64748B;margin-bottom:8px;">${template.party2Label}</div>
+      <div style="font-size:11px;font-weight:800;color:#64748B;margin-bottom:8px;font-family:'Cairo',Tahoma,sans-serif;">${template.party2Label}</div>
       <div style="border-bottom:1px dashed #94A3B8;height:44px;margin-bottom:8px;"></div>
-      <div style="font-size:11px;color:#94A3B8;">التوقيع والختم</div>
-      <div style="font-size:11px;color:#94A3B8;margin-top:8px;">التاريخ: _______ / _______ / _______</div>
+      <div style="font-size:11px;color:#94A3B8;font-family:'Cairo',Tahoma,sans-serif;">التوقيع والختم</div>
+      <div style="font-size:11px;color:#94A3B8;margin-top:8px;font-family:'Cairo',Tahoma,sans-serif;">التاريخ: _______ / _______ / _______</div>
     </div>
   </div>
 </div>
 
 <!-- ═══ DIGITAL ACCEPTANCE ═══ -->
 <div style="padding:16px 36px;border-bottom:1px solid #F1F5F9;">
-  <div style="font-size:11px;font-weight:800;color:#D8A31E;letter-spacing:0.5px;margin-bottom:10px;text-transform:uppercase;">القبول الرقمي — Digital Acceptance</div>
+  ${sectionHead("القبول الرقمي — Digital Acceptance")}
   <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:6px;padding:14px;">
-    <div style="font-size:12px;font-weight:700;color:#1E40AF;margin-bottom:8px;">إقرار القبول الإلكتروني</div>
-    <div style="font-size:11px;color:#334155;line-height:1.75;margin-bottom:10px;">
+    <div style="font-size:12px;font-weight:700;color:#1E40AF;margin-bottom:8px;font-family:'Cairo',Tahoma,sans-serif;">إقرار القبول الإلكتروني</div>
+    <div style="font-size:11px;color:#334155;line-height:1.85;margin-bottom:10px;font-family:'Cairo',Tahoma,sans-serif;">
       بقبول هذا النموذج إلكترونيًا أو بالتوقيع يدويًا، يُقر الطرف الأول بأنه اطلع على جميع بنود هذه الوثيقة وفهمها ووافق عليها وفق الأنظمة المعمول بها في المملكة العربية السعودية.
     </div>
     <div style="border:1px solid #BFDBFE;border-radius:4px;overflow:hidden;">
@@ -372,7 +430,7 @@ ${
 
 <!-- ═══ ATTACHMENTS ═══ -->
 <div style="padding:16px 36px;border-bottom:1px solid #F1F5F9;">
-  <div style="font-size:11px;font-weight:800;color:#D8A31E;letter-spacing:0.5px;margin-bottom:10px;text-transform:uppercase;">المرفقات — Attachments</div>
+  ${sectionHead("المرفقات — Attachments")}
   <div style="border:1px dashed #CBD5E1;border-radius:6px;overflow:hidden;">
     ${attachItem("1", "عرض السعر المعتمد")}
     ${attachItem("2", "صور المعدة قبل وبعد الاستلام")}
@@ -385,20 +443,21 @@ ${
 <!-- ═══ FOOTER ═══ -->
 <div style="background:#F8FAFC;border-top:3px solid #D8A31E;padding:16px 36px;">
   <div style="background:#FEF3C7;border:1px solid #FCD34D;border-right:4px solid #D97706;border-radius:4px;padding:12px 16px;">
-    <div style="font-size:11px;font-weight:700;color:#78350F;line-height:1.75;">
+    <div style="font-size:11px;font-weight:700;color:#78350F;line-height:1.85;font-family:'Cairo',Tahoma,sans-serif;">
       &#9888;&#65039; تحذير قانوني: ${LEGAL_DISCLAIMER}
     </div>
-    <div style="font-size:10px;color:#92400E;margin-top:4px;font-style:italic;">
+    <div style="font-size:10px;color:#92400E;margin-top:4px;font-style:italic;font-family:'Cairo',Tahoma,sans-serif;">
       &#9888; Legal Notice: ${LEGAL_DISCLAIMER_EN}
     </div>
   </div>
-  <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:10px;color:#94A3B8;">
+  <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:10px;color:#94A3B8;font-family:'Cairo',Tahoma,sans-serif;">
     <span>فليت معدات | Fleet Equipment Platform</span>
     <span>${refNumber}</span>
     <span>${dateStr}</span>
   </div>
 </div>
 
+</div><!-- /.fe-doc -->
 </body>
 </html>`;
 }
@@ -423,20 +482,25 @@ export async function generateLegalDocumentPDF(
   // Create a hidden rendering container
   const container = document.createElement("div");
   container.style.cssText =
-    "position:fixed;top:-99999px;left:-99999px;width:794px;background:#fff;z-index:-1;";
+    "position:fixed;top:-99999px;left:-99999px;width:794px;background:#fff;z-index:-1;overflow:visible;";
   container.innerHTML = html;
   document.body.appendChild(container);
 
-  try {
-    // Find the actual body element inside the injected HTML
-    const bodyEl = container.querySelector("body") ?? container;
+  // Wait for Cairo font to load (injected @font-face from innerHTML)
+  await document.fonts.ready;
 
-    const canvas = await html2canvas(bodyEl as HTMLElement, {
+  try {
+    // Target the .fe-doc wrapper (not <body> — body selector won't work inside a div)
+    const docEl =
+      (container.querySelector(".fe-doc") as HTMLElement) ?? container;
+
+    const canvas = await html2canvas(docEl, {
       scale: 2,
       useCORS: true,
       logging: false,
       backgroundColor: "#ffffff",
       width: 794,
+      windowWidth: 794,
     });
 
     const imgData = canvas.toDataURL("image/jpeg", 0.95);
