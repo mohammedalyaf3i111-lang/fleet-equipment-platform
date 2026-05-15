@@ -2,7 +2,7 @@
 import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
 import { AlertTriangle, ArrowLeft, BadgeCheck, BrickWall, CircleGauge, Construction, Container, Download, Droplets, Eye, Factory, FileCheck2, Forklift, Fuel, Gauge, Headphones, Mail, Mountain, Printer, Route, Send, Shield, ShieldCheck, ToyBrick, Truck, Users, Waves } from "lucide-react";
-import { EquipmentCategoriesSection, PopularServicesSection, HowItWorksSection, WasteHighlightSection, WhyChooseUsSection, StatsStripSection, SupplierCtaSection } from "@/components/home-sections";
+import { PopularServicesSection, HowItWorksSection, WasteHighlightSection, WhyChooseUsSection, StatsStripSection, SupplierCtaSection } from "@/components/home-sections";
 import { HeroImage } from "@/components/hero-image";
 import { EquipmentMarketplace } from "@/components/equipment-marketplace";
 import { RequestEquipmentForm } from "@/components/request-equipment-form";
@@ -108,13 +108,12 @@ export function HomePage() {
   return (
     <PublicShell>
       <Hero />
-      <EquipmentCategoriesSection />
+      <EquipmentSection />
       <PopularServicesSection />
       <HowItWorksSection />
       <WasteHighlightSection />
       <WhyChooseUsSection />
       <StatsStripSection />
-      <EquipmentSection />
       <SupplierCtaSection />
       <Section title="النماذج القانونية القابلة للتنزيل" eyebrow="توليد PDF فوري من المتصفح" className="bg-white">
         <LegalPDFGenerator />
