@@ -18,6 +18,7 @@ import { buildGeneratedDocument, getDocumentTemplate, listGeneratedDocuments, pa
 import { findServiceCategory, serviceCategories, type ServiceCategory, type ServiceFilterField } from "@/lib/service-categories";
 import { BrickBlockService } from "@/components/brick-block-service";
 import { BackfillingService } from "@/components/backfilling-service";
+import { ConstructionWasteService } from "@/components/construction-waste-service";
 import { officialWhatsAppDisplay, officialWhatsAppLink } from "@/lib/contact";
 import {
   adminOperationActions,
@@ -546,6 +547,13 @@ function ServiceCategoryView({ service }: { service: ServiceCategory }) {
     return (
       <PublicShell>
         <BackfillingService service={service} />
+      </PublicShell>
+    );
+  }
+  if (service.slug === "construction-waste") {
+    return (
+      <PublicShell>
+        <ConstructionWasteService service={service} />
       </PublicShell>
     );
   }

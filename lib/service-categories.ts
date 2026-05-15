@@ -67,6 +67,17 @@ const heavyTransportFilters: ServiceFilterField[] = [
   { key: "availableNow", label: "نقل متاح الآن", type: "boolean" }
 ];
 
+const constructionWasteFilters: ServiceFilterField[] = [
+  { key: "wasteType", label: "نوع المخلفات", type: "select", options: ["خرسانة", "رمل", "طوب", "خشب", "حديد", "مخلفات مختلطة"] },
+  { key: "projectSize", label: "حجم المشروع", type: "select", options: ["منزل", "عمارة", "مشروع تجاري", "مصنع"] },
+  { key: "serviceType", label: "نوع الخدمة", type: "select", options: ["حاوية فقط", "نقل فقط", "تحميل + نقل", "تنظيف كامل"] },
+  { key: "duration", label: "مدة الخدمة", type: "select", options: ["يومي", "أسبوعي", "شهري"] },
+  { key: "tripCount", label: "عدد النقلات", type: "select", options: ["نقلة واحدة", "عدة نقلات", "عقد مستمر"] },
+  { key: "containerSize", label: "حجم الحاوية", type: "select", options: ["6 ياردة", "12 ياردة", "20 ياردة", "40 ياردة", "يومية", "شهرية"] },
+  { key: "emergencyService", label: "خدمة طوارئ 24 ساعة", type: "boolean" },
+  { key: "withLoader", label: "مع معدة تحميل", type: "boolean" }
+];
+
 export const serviceCategories: ServiceCategory[] = [
   {
     slug: "bricks-blocks",
@@ -211,6 +222,30 @@ export const serviceCategories: ServiceCategory[] = [
     equipment: ["سقالات", "مان لفت", "بوم لفت", "معدات تشطيب خرسانة", "مولدات صغيرة"],
     services: ["تشطيب خرسانة", "أعمال ارتفاع", "تشغيل داخلي وخارجي"],
     stats: [{ label: "خدمات", value: "+18" }, { label: "ارتفاع", value: "حتى 32م" }, { label: "تشغيل", value: "مرن" }]
+  },
+  {
+    slug: "construction-waste",
+    arabicName: "مخلفات البناء",
+    seoTitle: "نقل مخلفات البناء والهدم | حاويات وقلابات | فليت معدات",
+    seoDescription: "خدمات متكاملة لنقل مخلفات البناء والهدم: حاويات 6-40 ياردة، قلابات، شيولات، بوبكات، تنظيف مواقع، رفع أنقاض وهدم وخرسانة. استلام خلال ساعتين.",
+    heroTitle: "مخلفات البناء والهدم — حلول متكاملة",
+    description: "حلول متكاملة لنقل مخلفات البناء والهدم وتنظيف مواقع المشاريع. من الحاويات والقلابات إلى الشيولات والبوبكات مع خدمة طوارئ 24 ساعة.",
+    image: "/images/categories/waste.jpg",
+    accent: "#64748B",
+    filters: constructionWasteFilters,
+    equipment: ["قلابات نقل الردميات", "شيول تحميل مخلفات", "بوبكات", "بوكلينات", "كرين رفع مخلفات", "عمال تحميل", "معدات تكسير خفيف"],
+    services: [
+      "حاويات مخلفات بناء", "نقل أنقاض وهدم", "رفع وترحيل الردميات", "إزالة مخلفات الخرسانة",
+      "نقل الطوب والبلوك المكسر", "إزالة الحديد والخشب المتبقي", "تنظيف مواقع المشاريع",
+      "تنظيف بعد الهدم", "تنظيف بعد الترميم", "تحميل مخلفات بالبكلين",
+      "شفط ونقل المخلفات الثقيلة", "سطحات نقل المعدات الصغيرة"
+    ],
+    stats: [
+      { label: "خدمات متخصصة", value: "+14" },
+      { label: "أنواع الحاويات", value: "7" },
+      { label: "استلام", value: "خلال 2 ساعة" },
+      { label: "خدمة طوارئ", value: "24 ساعة" }
+    ]
   },
   {
     slug: "emergency",

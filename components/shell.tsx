@@ -83,6 +83,7 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
             <div className="mt-3 grid gap-2 text-sm text-white/75">
               <Link href="/terms">{t("footer.terms")}</Link>
               <Link href="/privacy">{t("footer.privacy")}</Link>
+              <Link href="/services/construction-waste" className="font-bold text-white/75 hover:text-white">مخلفات البناء والهدم</Link>
               <Link href="/legal-forms" className="font-bold text-gold/80 hover:text-gold">النماذج القانونية (PDF)</Link>
               <Link href="/contact">{t("footer.contact")}</Link>
             </div>
