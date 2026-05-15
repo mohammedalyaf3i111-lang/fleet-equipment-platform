@@ -1,14 +1,18 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
-import { AlertTriangle, ArrowLeft, BadgeCheck, BrickWall, CircleGauge, Construction, Container, Download, Droplets, Eye, Factory, FileCheck2, Forklift, Fuel, Gauge, Headphones, Mail, Mountain, Printer, Route, Send, Shield, ShieldCheck, ToyBrick, Truck, Users, Waves } from "lucide-react";
+import { AlertTriangle, ArrowLeft, BrickWall, CircleGauge, Construction, Container, Download, Droplets, Eye, Factory, FileCheck2, Forklift, Fuel, Gauge, Mail, Mountain, Printer, Route, Send, Shield, ShieldCheck, ToyBrick, Truck, Waves } from "lucide-react";
+import { HomeHero, EquipmentCategoriesSection, PopularServicesSection, HowItWorksSection, WasteHighlightSection, WhyChooseUsSection, StatsStripSection, SupplierCtaSection } from "@/components/home-sections";
+import { EquipmentMarketplace } from "@/components/equipment-marketplace";
+import { RequestEquipmentForm } from "@/components/request-equipment-form";
+import { SupplierStepper } from "@/components/supplier-stepper";
+import { AboutPageContent, ContactPageContent, TermsPageContent, PrivacyPageContent } from "@/components/static-pages";
 import { LegalPDFGenerator } from "@/components/legal-pdf-generator";
 import { PublicShell } from "@/components/shell";
-import { HeroImage } from "@/components/hero-image";
-import { ButtonLink, Field, IconCard, MetricCard, Section, StatusBadge, SubmitButton } from "@/components/ui";
-import { CustomerRegisterForm, LoginForm, RentalRequestForm, SupplierRegisterForm } from "@/components/forms";
+import { ButtonLink, Field, MetricCard, Section, StatusBadge, SubmitButton } from "@/components/ui";
+import { CustomerRegisterForm, LoginForm, SupplierRegisterForm } from "@/components/forms";
 import { EquipmentSearch } from "@/components/equipment-search";
-import { adminStats, dashboardMenus, equipmentItems, landingStats, orderRows, requestRows, roleCards, valueProps, workflows } from "@/lib/mock-data";
+import { adminStats, dashboardMenus, equipmentItems, landingStats, orderRows, requestRows } from "@/lib/mock-data";
 import { calculateQuote } from "@/lib/business";
 import { buildLegalDocuments, legalDisclaimer } from "@/lib/contracts";
 import { brand } from "@/lib/brand";
@@ -19,7 +23,7 @@ import { findServiceCategory, serviceCategories, type ServiceCategory, type Serv
 import { BrickBlockService } from "@/components/brick-block-service";
 import { BackfillingService } from "@/components/backfilling-service";
 import { ConstructionWasteService } from "@/components/construction-waste-service";
-import { officialWhatsAppDisplay, officialWhatsAppLink } from "@/lib/contact";
+import { officialWhatsAppDisplay } from "@/lib/contact";
 import {
   adminOperationActions,
   customerOperationActions,
@@ -39,96 +43,20 @@ import {
   supplierOperationActions
 } from "@/lib/operation-contracts";
 
-function Hero() {
-  const trustIndicators = [
-    { label: "عقود رقمية موثقة", icon: FileCheck2 },
-    { label: "مزودون معتمدون", icon: BadgeCheck },
-    { label: "حماية وتشغيل احترافي", icon: ShieldCheck },
-    { label: "دعم فني متكامل", icon: Headphones }
-  ];
-  const heroStats = [
-    { value: "+500", label: "مزود معتمد", icon: Users },
-    { value: "+2500", label: "معدة متنوعة", icon: Truck },
-    { value: "+1500", label: "عميل وشركة", icon: BadgeCheck },
-    { value: "+50", label: "مدينة داخل المملكة", icon: ShieldCheck }
-  ];
-
-  return (
-    <section className="relative isolate min-h-[700px] overflow-hidden bg-navy text-white md:min-h-[780px]">
-      <HeroImage />
-      <div className="absolute inset-0 z-[1] bg-[linear-gradient(90deg,rgba(7,22,42,0.70)_0%,rgba(7,22,42,0.66)_33%,rgba(7,22,42,0.42)_55%,rgba(7,22,42,0.14)_78%,rgba(7,22,42,0.06)_100%)]" />
-      <div className="absolute inset-0 z-[2] bg-[radial-gradient(circle_at_72%_42%,rgba(255,255,255,0.08),transparent_22%),radial-gradient(circle_at_50%_50%,transparent_48%,rgba(2,8,18,0.58)_100%)]" />
-      <div className="absolute inset-0 z-[3] bg-[linear-gradient(180deg,rgba(3,10,20,0.02),rgba(3,10,20,0.72))]" />
-      <div className="relative z-10 mx-auto flex min-h-[700px] max-w-7xl items-center px-4 pb-40 pt-[clamp(90px,12vh,140px)] sm:px-6 md:min-h-[780px] md:pb-44 lg:px-8">
-        <div className="hero-rise mr-auto max-w-2xl translate-y-3 rounded-2xl border border-white/10 bg-navy/10 p-0 text-right shadow-2xl shadow-black/20 backdrop-blur-[1px] sm:translate-y-6 lg:max-w-3xl lg:translate-y-8">
-          <p className="mb-5 inline-flex rounded-md border border-gold/45 bg-white/10 px-4 py-2 text-sm font-semibold text-gold shadow-2xl backdrop-blur">
-            منصة سعودية لإدارة تأجير المعدات
-          </p>
-          <h1 className="max-w-3xl text-4xl font-extrabold leading-[1.16] text-white drop-shadow-2xl sm:text-5xl lg:text-6xl">
-            منصة فليت معدات<br />
-            لتأجير المعدات<br />
-            وإدارة الأساطيل
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg font-medium leading-9 text-white/84 sm:text-xl">
-            حل احترافي يربط ملاك المعدات بالمقاولين والشركات<br className="hidden sm:block" />
-            مع عقود رقمية وتشغيل متكامل..
-          </p>
-          <div className="mt-9 flex flex-wrap gap-3">
-            <ButtonLink href="/request-equipment">اطلب معدة الآن</ButtonLink>
-            <ButtonLink href="/become-supplier" variant="secondary">سجل كمزود معدات</ButtonLink>
-          </div>
-          <div className="hero-rise-delay mt-8 grid max-w-3xl gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {trustIndicators.map(({ label, icon: Icon }) => (
-              <div key={label} className="group rounded-xl border border-white/16 bg-white/[0.11] px-4 py-4 text-sm font-semibold text-white shadow-2xl shadow-black/20 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-gold/65 hover:bg-white/[0.16]">
-                <Icon className="mb-3 h-5 w-5 text-gold transition group-hover:scale-110" />
-                {label}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="absolute inset-x-4 bottom-5 z-10 mx-auto max-w-7xl sm:bottom-8 sm:px-2">
-        <div className="grid overflow-hidden rounded-2xl border border-white/16 bg-white/[0.13] shadow-2xl shadow-black/30 backdrop-blur-2xl sm:grid-cols-2 lg:grid-cols-4">
-          {heroStats.map(({ value, label, icon: Icon }) => (
-            <div key={label} className="group border-white/12 px-5 py-5 text-right transition duration-300 hover:bg-white/[0.08] sm:border-l">
-              <Icon className="mb-3 h-5 w-5 text-gold transition group-hover:scale-110" />
-              <p className="text-3xl font-extrabold text-gold">{value}</p>
-              <p className="mt-1 text-sm font-semibold text-white/82">{label}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export function HomePage() {
   return (
     <PublicShell>
-      <Hero />
-      <Section title="مؤشرات تشغيلية">
-        <div className="grid gap-4 md:grid-cols-4">{landingStats.map((stat) => <MetricCard key={stat.label} {...stat} />)}</div>
-      </Section>
-      <Section title="كيف تعمل المنصة" className="bg-white">
-        <div className="grid gap-4 md:grid-cols-4">
-          {workflows.map((step, index) => (
-            <div key={step.title} className="rounded-lg border border-slate-200 p-5">
-              <span className="flex h-10 w-10 items-center justify-center rounded-md bg-gold text-navy font-black">{index + 1}</span>
-              <h3 className="mt-5 font-bold text-navy">{step.title}</h3>
-              <p className="mt-3 leading-7 text-steel">{step.body}</p>
-            </div>
-          ))}
-        </div>
-      </Section>
+      <HomeHero />
+      <EquipmentCategoriesSection />
+      <PopularServicesSection />
+      <HowItWorksSection />
+      <WasteHighlightSection />
+      <WhyChooseUsSection />
+      <StatsStripSection />
       <EquipmentSection />
-      <Section title={`لماذا ${brand.arabicName}`} eyebrow="حماية وتشغيل وثقة">
-        <div className="grid gap-4 md:grid-cols-4">{valueProps.map((item) => <IconCard key={item.title} {...item} />)}</div>
-      </Section>
+      <SupplierCtaSection />
       <Section title="النماذج القانونية القابلة للتنزيل" eyebrow="توليد PDF فوري من المتصفح" className="bg-white">
         <LegalPDFGenerator />
-      </Section>
-      <Section title="للشركات والمقاولين والموردين">
-        <div className="grid gap-4 md:grid-cols-3">{roleCards.map((card) => <IconCard key={card.title} {...card} />)}</div>
       </Section>
       <FaqSection />
     </PublicShell>
@@ -438,11 +366,12 @@ export function StaticPublicPage({ slug, categorySlug }: { slug: string; categor
           <p className="mt-4 max-w-3xl leading-8 text-white/75">{page.body}</p>
         </div>
       </section>
-      {page.kind === "equipment" ? <EquipmentListing categorySlug={categorySlug} /> : null}
-      {page.kind === "supplier" ? <SupplierInfo /> : null}
-      {page.kind === "contact" ? <ContactPanel /> : null}
-      {page.kind === "legal" ? <LegalPanel /> : null}
-      {page.kind === "about" ? <Section title="منصة عمليات قبل أن تكون قائمة إعلانات"><div className="grid gap-4 md:grid-cols-3">{valueProps.slice(0, 3).map((item) => <IconCard key={item.title} {...item} />)}</div></Section> : null}
+      {page.kind === "equipment" ? <EquipmentMarketplace categorySlug={categorySlug} /> : null}
+      {page.kind === "supplier" ? <SupplierStepper /> : null}
+      {page.kind === "contact" ? <ContactPageContent /> : null}
+      {page.kind === "legal" && slug === "terms" ? <TermsPageContent /> : null}
+      {page.kind === "legal" && slug === "privacy" ? <PrivacyPageContent /> : null}
+      {page.kind === "about" ? <AboutPageContent /> : null}
     </PublicShell>
   );
 }
@@ -618,40 +547,6 @@ export function ServiceCategoryPage({ slug }: { slug: string }) {
   return <ServiceCategoryView service={service} />;
 }
 
-function SupplierInfo() {
-  return (
-    <Section title="للملاك والموردين">
-      <div className="grid gap-4 md:grid-cols-3">
-        {["اعتماد منشأة", "إدارة معدات", "أوامر تشغيل"].map((item) => (
-          <div key={item} className="rounded-lg border border-slate-200 bg-white p-5 shadow-soft">
-            <h3 className="font-bold text-navy">{item}</h3>
-            <p className="mt-3 leading-7 text-steel">ارفع المستندات وحدد الأسعار والتوفر ثم استقبل الطلبات بعد موافقة الإدارة.</p>
-          </div>
-        ))}
-      </div>
-      <div className="mt-6 rounded-lg border border-gold/30 bg-white p-4 text-sm font-bold text-navy shadow-soft">
-        للتواصل مع فريق اعتماد الموردين: <a href={officialWhatsAppLink} target="_blank" rel="noreferrer" className="text-[#128C7E]">واتساب {officialWhatsAppDisplay}</a>
-      </div>
-      <div className="mt-6"><SupplierRegisterForm /></div>
-    </Section>
-  );
-}
-
-function ContactPanel() {
-  return (
-    <Section title="قنوات التواصل">
-      <div className="grid gap-4 md:grid-cols-3">
-        {["operations@fleetequipment.sa", officialWhatsAppDisplay, brand.primaryDomain].map((item) => (
-          <div key={item} className="rounded-lg border border-slate-200 bg-white p-5 font-bold text-navy shadow-soft">{item}</div>
-        ))}
-      </div>
-      <a href={officialWhatsAppLink} target="_blank" rel="noreferrer" className="mt-5 inline-flex rounded-md bg-[#25D366] px-5 py-3 text-sm font-black text-white shadow-soft">
-        تواصل واتساب
-      </a>
-    </Section>
-  );
-}
-
 function LegalPanel() {
   return (
     <>
@@ -723,12 +618,7 @@ export function AuthPage({ type }: { type: "login" | "customer" | "supplier" }) 
 export function RequestEquipmentPage() {
   return (
     <PublicShell>
-      <Section title="طلب معدة" eyebrow="إدخال طلب تشغيل جديد">
-        <div className="mb-5 rounded-lg border border-gold/30 bg-white p-4 text-sm font-bold text-navy shadow-soft">
-          للدعم السريع أثناء الطلب: <a href={officialWhatsAppLink} target="_blank" rel="noreferrer" className="text-[#128C7E]">واتساب {officialWhatsAppDisplay}</a>
-        </div>
-        <RentalRequestForm />
-      </Section>
+      <RequestEquipmentForm />
     </PublicShell>
   );
 }
@@ -1688,3 +1578,4 @@ export function NotFoundPage() {
     </PublicShell>
   );
 }
+

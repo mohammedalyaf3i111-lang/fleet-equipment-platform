@@ -1,8 +1,10 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, ShieldCheck } from "lucide-react";
+import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { Menu, X, ShieldCheck, Twitter, Linkedin, Instagram } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ButtonLink } from "@/components/ui";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -20,10 +22,12 @@ const navItems = [
 
 export function PublicShell({ children }: { children: React.ReactNode }) {
   const t = useTranslations();
+  const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-mist">
-      <header className="sticky top-0 z-40 border-b border-white/50 bg-white/82 shadow-sm shadow-slate-900/5 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/95 shadow-sm shadow-slate-900/5 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6 lg:px-8">
           <Link href="/" className="flex shrink-0 items-center gap-3.5">
             <Image src="/logo.svg" alt={t("brand.name")} width={56} height={56} priority className="h-14 w-14" />
@@ -33,67 +37,123 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
             </span>
           </Link>
           <nav className="hidden items-center gap-7 text-sm font-bold text-ink lg:flex">
-            {navItems.map((item) => (
-              <Link key={item.href} href={item.href} className="transition hover:text-gold">
-                {t(`nav.${item.key}`)}
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+              return (
+                <Link key={item.href} href={item.href} className={`relative pb-0.5 transition hover:text-gold ${isActive ? "text-gold" : "text-navy"}`}>
+                  {t(`nav.${item.key}`)}
+                  {isActive && <span className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-gold" />}
+                </Link>
+              );
+            })}
           </nav>
           <div className="hidden items-center gap-3 lg:flex">
+            <a href={officialWhatsAppLink} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-full bg-[#25D366]/10 px-4 py-2 text-xs font-black text-[#128C7E] transition hover:bg-[#25D366]/20">
+              <span className="h-2 w-2 rounded-full bg-[#25D366]" />
+              واتساب
+            </a>
             <LanguageSwitcher />
-            <ButtonLink href="/login" variant="ghost">
-              {t("nav.login")}
-            </ButtonLink>
+            <ButtonLink href="/login" variant="ghost">{t("nav.login")}</ButtonLink>
             <ButtonLink href="/request-equipment">{t("actions.requestEquipment")}</ButtonLink>
           </div>
           <div className="flex items-center gap-2 lg:hidden">
             <LanguageSwitcher compact />
-            <Link href="/login" className="rounded-md border border-slate-200 p-2 text-navy" aria-label={t("nav.login")}>
-              <Menu className="h-5 w-5" />
-            </Link>
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="rounded-md border border-slate-200 p-2 text-navy" aria-label="قائمة">
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
         </div>
+        {mobileOpen && (
+          <div className="border-t border-slate-200 bg-white px-4 pb-4 pt-3 lg:hidden">
+            <nav className="grid gap-1">
+              {navItems.map((item) => {
+                const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+                return (
+                  <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)} className={`rounded-md px-4 py-2.5 text-sm font-bold transition ${isActive ? "bg-gold/10 text-gold" : "text-navy hover:bg-mist"}`}>
+                    {t(`nav.${item.key}`)}
+                  </Link>
+                );
+              })}
+            </nav>
+            <div className="mt-4 grid gap-2">
+              <a href={officialWhatsAppLink} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 rounded-md bg-[#25D366] py-3 text-sm font-black text-white">تواصل عبر واتساب</a>
+              <Link href="/request-equipment" onClick={() => setMobileOpen(false)} className="flex items-center justify-center rounded-md bg-gold py-3 text-sm font-black text-navy">{t("actions.requestEquipment")}</Link>
+              <Link href="/login" onClick={() => setMobileOpen(false)} className="flex items-center justify-center rounded-md border border-navy/15 py-3 text-sm font-bold text-navy">{t("nav.login")}</Link>
+            </div>
+          </div>
+        )}
       </header>
       {children}
-      <a
-        href={officialWhatsAppLink}
-        target="_blank"
-        rel="noreferrer"
-        className="fixed bottom-5 right-5 z-50 rounded-full bg-[#25D366] px-5 py-3 text-sm font-black text-white shadow-2xl shadow-slate-900/25 transition hover:-translate-y-0.5 hover:bg-[#1ebe5d] ltr:left-5 ltr:right-auto"
-      >
+      <a href={officialWhatsAppLink} target="_blank" rel="noreferrer" className="fixed bottom-5 right-5 z-50 rounded-full bg-[#25D366] px-5 py-3 text-sm font-black text-white shadow-2xl shadow-slate-900/25 transition hover:-translate-y-0.5 hover:bg-[#1ebe5d] ltr:left-5 ltr:right-auto">
         {t("actions.whatsapp")}
       </a>
-      <footer className="bg-navy px-4 py-10 text-white sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-3">
-          <div>
-            <div className="flex items-center gap-3">
-              <Image src="/logo.svg" alt={t("brand.name")} width={46} height={46} className="h-11 w-11" />
-              <h2 className="text-xl font-black">{t("brand.name")}</h2>
+      <footer className="bg-navy px-4 pt-14 pb-0 text-white sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <div className="flex items-center gap-3">
+                <Image src="/logo.svg" alt={t("brand.name")} width={46} height={46} className="h-11 w-11" />
+                <div>
+                  <h2 className="text-xl font-black">{t("brand.name")}</h2>
+                  <p className="text-xs text-white/60">{brand.englishName}</p>
+                </div>
+              </div>
+              <p className="mt-4 text-sm leading-7 text-white/65">{t("brand.subtitle")}</p>
+              <a href={officialWhatsAppLink} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 rounded-md bg-[#25D366]/15 px-4 py-2.5 text-sm font-bold text-[#25D366] transition hover:bg-[#25D366]/25">
+                <span className="h-2 w-2 rounded-full bg-[#25D366]" />
+                {officialWhatsAppDisplay}
+              </a>
+              <div className="mt-5 flex gap-3">
+                <a href="#" aria-label="Twitter" className="rounded-md border border-white/15 p-2 text-white/50 transition hover:border-gold hover:text-gold"><Twitter className="h-4 w-4" /></a>
+                <a href="#" aria-label="LinkedIn" className="rounded-md border border-white/15 p-2 text-white/50 transition hover:border-gold hover:text-gold"><Linkedin className="h-4 w-4" /></a>
+                <a href="#" aria-label="Instagram" className="rounded-md border border-white/15 p-2 text-white/50 transition hover:border-gold hover:text-gold"><Instagram className="h-4 w-4" /></a>
+              </div>
             </div>
-            <p className="mt-3 leading-7 text-white/70">{t("brand.subtitle")}</p>
-            <a href={officialWhatsAppLink} target="_blank" rel="noreferrer" className="mt-3 inline-flex text-sm font-bold text-gold">
-              {t("footer.whatsapp")}: {officialWhatsAppDisplay}
-            </a>
-            <p className="mt-2 text-sm text-white/50">
-              {brand.primaryDomain} · {brand.globalDomain}
-            </p>
+            <div>
+              <h3 className="mb-4 text-sm font-black text-gold">روابط سريعة</h3>
+              <nav className="grid gap-2.5 text-sm text-white/70">
+                <Link href="/" className="transition hover:text-white">الرئيسية</Link>
+                <Link href="/equipment" className="transition hover:text-white">المعدات</Link>
+                <Link href="/request-equipment" className="transition hover:text-white">اطلب معدة</Link>
+                <Link href="/become-supplier" className="transition hover:text-white">سجل كمورد</Link>
+                <Link href="/about" className="transition hover:text-white">عن المنصة</Link>
+                <Link href="/contact" className="transition hover:text-white">تواصل معنا</Link>
+                <Link href="/legal-forms" className="font-bold text-gold/80 transition hover:text-gold">النماذج القانونية (PDF)</Link>
+              </nav>
+            </div>
+            <div>
+              <h3 className="mb-4 text-sm font-black text-gold">خدمات التشغيل</h3>
+              <nav className="grid gap-2.5 text-sm text-white/70">
+                <Link href="/services/concrete" className="transition hover:text-white">خدمات الخرسانة</Link>
+                <Link href="/services/backfilling" className="transition hover:text-white">ردم وتجهيز المواقع</Link>
+                <Link href="/services/construction-waste" className="transition hover:text-white">مخلفات البناء والهدم</Link>
+                <Link href="/services/lifting" className="transition hover:text-white">رفع ومناولة</Link>
+                <Link href="/services/heavy-transport" className="transition hover:text-white">نقل ثقيل</Link>
+                <Link href="/services/asphalt" className="transition hover:text-white">أعمال الأسفلت</Link>
+              </nav>
+            </div>
+            <div>
+              <h3 className="mb-4 text-sm font-black text-gold">الدعم والقانونية</h3>
+              <nav className="grid gap-2.5 text-sm text-white/70">
+                <Link href="/contact" className="transition hover:text-white">تواصل معنا</Link>
+                <Link href="/terms" className="transition hover:text-white">الشروط والأحكام</Link>
+                <Link href="/privacy" className="transition hover:text-white">سياسة الخصوصية</Link>
+                <Link href="/legal-forms" className="transition hover:text-white">النماذج القانونية</Link>
+              </nav>
+              <div className="mt-6 rounded-lg border border-white/15 p-4">
+                <div className="flex items-center gap-2 text-sm font-bold text-gold">
+                  <ShieldCheck className="h-4 w-4" />
+                  {t("footer.legalProtection")}
+                </div>
+                <p className="mt-3 text-xs leading-6 text-white/55">{t("footer.legalNotice")}</p>
+              </div>
+            </div>
           </div>
-          <div>
-            <h3 className="font-bold text-gold">{t("footer.importantLinks")}</h3>
-            <div className="mt-3 grid gap-2 text-sm text-white/75">
-              <Link href="/terms">{t("footer.terms")}</Link>
-              <Link href="/privacy">{t("footer.privacy")}</Link>
-              <Link href="/services/construction-waste" className="font-bold text-white/75 hover:text-white">مخلفات البناء والهدم</Link>
-              <Link href="/legal-forms" className="font-bold text-gold/80 hover:text-gold">النماذج القانونية (PDF)</Link>
-              <Link href="/contact">{t("footer.contact")}</Link>
+          <div className="mt-12 border-t border-white/10 py-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-white/45">
+              <p>©2025 {brand.arabicName} - {brand.legalOwner} - جميع الحقوق محفوظة - حقوق محفوظة</p>
+              <p>{brand.primaryDomain} - {brand.globalDomain}</p>
             </div>
-          </div>
-          <div className="rounded-lg border border-white/15 p-4">
-            <div className="flex items-center gap-2 font-bold text-gold">
-              <ShieldCheck className="h-5 w-5" />
-              {t("footer.legalProtection")}
-            </div>
-            <p className="mt-3 text-sm leading-7 text-white/70">{t("footer.legalNotice")}</p>
           </div>
         </div>
       </footer>
