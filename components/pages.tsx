@@ -1,13 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
-import { AlertTriangle, ArrowLeft, BadgeCheck, BrickWall, CircleGauge, Construction, Container, Download, Droplets, Eye, Factory, FileCheck2, FileText, Forklift, Fuel, Gauge, Headphones, Mail, Mountain, Printer, Route, Send, Shield, ShieldCheck, ToyBrick, Truck, Users, Waves } from "lucide-react";
+import { AlertTriangle, ArrowLeft, BadgeCheck, BrickWall, CircleGauge, Construction, Container, Download, Droplets, Eye, Factory, FileCheck2, Forklift, Fuel, Gauge, Headphones, Mail, Mountain, Printer, Route, Send, Shield, ShieldCheck, ToyBrick, Truck, Users, Waves } from "lucide-react";
+import { LegalPDFGenerator } from "@/components/legal-pdf-generator";
 import { PublicShell } from "@/components/shell";
 import { HeroImage } from "@/components/hero-image";
 import { ButtonLink, Field, IconCard, MetricCard, Section, StatusBadge, SubmitButton } from "@/components/ui";
 import { CustomerRegisterForm, LoginForm, RentalRequestForm, SupplierRegisterForm } from "@/components/forms";
 import { EquipmentSearch } from "@/components/equipment-search";
-import { adminStats, contractTemplates, dashboardMenus, equipmentItems, landingStats, orderRows, requestRows, roleCards, valueProps, workflows } from "@/lib/mock-data";
+import { adminStats, dashboardMenus, equipmentItems, landingStats, orderRows, requestRows, roleCards, valueProps, workflows } from "@/lib/mock-data";
 import { calculateQuote } from "@/lib/business";
 import { buildLegalDocuments, legalDisclaimer } from "@/lib/contracts";
 import { brand } from "@/lib/brand";
@@ -122,17 +123,8 @@ export function HomePage() {
       <Section title={`لماذا ${brand.arabicName}`} eyebrow="حماية وتشغيل وثقة">
         <div className="grid gap-4 md:grid-cols-4">{valueProps.map((item) => <IconCard key={item.title} {...item} />)}</div>
       </Section>
-      <Section title="حماية العقود والتوثيق" className="bg-white">
-        <div className="grid gap-4 md:grid-cols-3">
-          {contractTemplates.map((template) => (
-            <div key={template} className="rounded-lg border border-slate-200 p-5">
-              <FileText className="h-7 w-7 text-gold" />
-              <h3 className="mt-4 font-bold text-navy">{template}</h3>
-              <p className="mt-2 text-sm leading-7 text-steel">قابل للتوليد كمسودة PDF مع حقول توقيع وقبول رقمي ومرفقات.</p>
-            </div>
-          ))}
-        </div>
-        <p className="mt-6 rounded-md border border-amber-300 bg-amber-50 p-4 text-sm font-bold text-amber-900">{legalDisclaimer}</p>
+      <Section title="النماذج القانونية القابلة للتنزيل" eyebrow="توليد PDF فوري من المتصفح" className="bg-white">
+        <LegalPDFGenerator />
       </Section>
       <Section title="للشركات والمقاولين والموردين">
         <div className="grid gap-4 md:grid-cols-3">{roleCards.map((card) => <IconCard key={card.title} {...card} />)}</div>
@@ -654,23 +646,47 @@ function ContactPanel() {
 
 function LegalPanel() {
   return (
-    <Section title="المستندات والسياسات القانونية">
-      <div className="grid gap-4 md:grid-cols-2">
-        {buildLegalDocuments().map((document) => (
-          <div key={document.type} className="rounded-lg border border-slate-200 bg-white p-5 shadow-soft">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h3 className="font-bold text-navy">{document.title}</h3>
-                <p className="mt-2 text-sm text-steel">الإصدار {document.version} · منشور</p>
+    <>
+      <Section title="السياسات القانونية المنشورة">
+        <div className="grid gap-4 md:grid-cols-2">
+          {buildLegalDocuments().map((document) => (
+            <div key={document.type} className="rounded-lg border border-slate-200 bg-white p-5 shadow-soft">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="font-bold text-navy">{document.title}</h3>
+                  <p className="mt-2 text-sm text-steel">الإصدار {document.version} · منشور</p>
+                </div>
+                <StatusBadge>{document.status}</StatusBadge>
               </div>
-              <StatusBadge>{document.status}</StatusBadge>
+              <p className="mt-4 leading-7 text-steel">{document.body[0]}</p>
             </div>
-            <p className="mt-4 leading-7 text-steel">{document.body[0]}</p>
-          </div>
-        ))}
-      </div>
-      <p className="mt-6 rounded-md border border-amber-300 bg-amber-50 p-4 text-sm font-bold text-amber-900">{legalDisclaimer}</p>
-    </Section>
+          ))}
+        </div>
+        <p className="mt-6 rounded-md border border-amber-300 bg-amber-50 p-4 text-sm font-bold text-amber-900">{legalDisclaimer}</p>
+      </Section>
+      <Section title="النماذج القانونية القابلة للتنزيل" eyebrow="توليد PDF فوري — Download PDF" className="bg-white">
+        <LegalPDFGenerator />
+      </Section>
+    </>
+  );
+}
+
+export function LegalFormsPage() {
+  return (
+    <PublicShell>
+      <section className="bg-navy px-4 py-14 text-white sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <p className="mb-3 text-sm font-bold text-gold">توليد PDF فوري من المتصفح</p>
+          <h1 className="text-4xl font-black">النماذج القانونية</h1>
+          <p className="mt-4 max-w-3xl leading-8 text-white/75">
+            عبِّئ بيانات الأطراف والمعدة ثم حمِّل نموذجك القانوني بصيغة PDF جاهزة — كل النماذج مسودات أولية تتطلب مراجعة قانونية قبل الاستخدام التجاري.
+          </p>
+        </div>
+      </section>
+      <Section title="النماذج المتاحة للتنزيل" eyebrow="7 نماذج قانونية احترافية">
+        <LegalPDFGenerator />
+      </Section>
+    </PublicShell>
   );
 }
 

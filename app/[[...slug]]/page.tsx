@@ -4,6 +4,7 @@ import {
   DocumentPreviewPage,
   HomePage,
   LaunchChecklistPage,
+  LegalFormsPage,
   NotFoundPage,
   RequestEquipmentPage,
   ServiceCategoryPage,
@@ -49,6 +50,7 @@ export default async function PlatformRoute({
   const path = slug.join("/");
 
   if (slug.length === 0) return <HomePage />;
+  if (path === "legal-forms") return <LegalFormsPage />;
   if (path === "admin/legal/documents") return <DashboardPage role="admin" page="legal-documents" />;
   if (slug[0] === "legal" && slug[1] === "document" && slug[2]) {
     return <DocumentPreviewPage id={slug[2]} print={query.print === "1"} />;
