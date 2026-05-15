@@ -165,7 +165,7 @@ export function WasteHighlightSection() {
       <div className="mx-auto max-w-7xl">
         <div className="relative overflow-hidden rounded-2xl bg-slate-800 p-8 text-white md:p-12">
           <div className="absolute inset-0 opacity-20">
-            <Image src="/images/services/construction-waste.jpg" alt="مخلفات البناء" fill sizes="(min-width: 1280px) 1200px, 100vw" className="object-cover" />
+            <Image src="/images/categories/waste.jpg" alt="مخلفات البناء" fill sizes="(min-width: 1280px) 1200px, 100vw" className="object-cover" />
           </div>
           <div className="absolute inset-0 bg-gradient-to-l from-slate-900/80 via-slate-800/60 to-slate-900/80" />
           <div className="absolute right-0 top-0 h-full w-1 bg-gold" />
