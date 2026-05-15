@@ -1,0 +1,43 @@
+{
+  "metadata": {
+    "title": "Fleet Equipment | Equipment Rental and Fleet Operations Platform",
+    "description": "A professional Saudi platform connecting equipment owners with contractors and companies through digital contracts, operational workflows, and documented payments.",
+    "keywords": "equipment rental, heavy equipment, cranes, excavators, wheel loaders, dump trucks, Fleet Equipment"
+  },
+  "brand": {
+    "name": "Fleet Equipment",
+    "englishName": "فليت معدات",
+    "subtitle": "Equipment Rental and Fleet Operations Platform"
+  },
+  "nav": {
+    "home": "Home",
+    "equipment": "Equipment",
+    "request": "Request Equipment",
+    "supplier": "Become a Supplier",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Login"
+  },
+  "actions": {
+    "requestEquipment": "Request Equipment",
+    "whatsapp": "WhatsApp"
+  },
+  "footer": {
+    "importantLinks": "Important Links",
+    "terms": "Terms and Conditions",
+    "privacy": "Privacy Policy",
+    "contact": "Contact Us",
+    "whatsapp": "WhatsApp",
+    "legalProtection": "Legal and Operational Protection",
+    "legalNotice": "These legal templates are preliminary and must be reviewed by a licensed legal advisor in Saudi Arabia before final commercial use."
+  },
+  "terms": {
+    "cranes": "Cranes",
+    "excavators": "Excavators",
+    "wheelLoaders": "Wheel Loaders",
+    "dumpTrucks": "Dump Trucks",
+    "operationOrder": "Operation Order",
+    "supplier": "Supplier",
+    "newRequest": "New Request"
+  }
+}

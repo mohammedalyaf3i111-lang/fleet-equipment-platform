@@ -1,0 +1,806 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CUSTOMER
+  SUPPLIER
+  DRIVER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum TrustLevel {
+  NEW
+  VERIFIED
+  TRUSTED
+  PREMIUM
+  RESTRICTED
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum EquipmentStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  INACTIVE
+  RENTED
+}
+
+enum RentalRequestStatus {
+  NEW
+  QUOTED
+  AWAITING_CUSTOMER_APPROVAL
+  AWAITING_PAYMENT_DEPOSIT
+  CONFIRMED
+  EQUIPMENT_DISPATCHED
+  DELIVERED
+  ACTIVE_RENTAL
+  EXTENSION_REQUESTED
+  RETURN_REQUESTED
+  COMPLETED
+  DISPUTE
+  CANCELLED
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum ContractType {
+  CUSTOMER_RENTAL_AGREEMENT
+  SUPPLIER_PLATFORM_AGREEMENT
+  EQUIPMENT_HANDOVER_FORM
+  EQUIPMENT_RETURN_FORM
+  DAMAGE_REPORT
+  PAYMENT_ACKNOWLEDGMENT
+  CANCELLATION_REPORT
+}
+
+enum ContractStatus {
+  DRAFT
+  GENERATED
+  ACCEPTED
+  SIGNED
+  VOID
+}
+
+enum PaymentStatus {
+  UNPAID
+  DEPOSIT_PAID
+  PARTIALLY_PAID
+  FULLY_PAID
+  OVERDUE
+  REFUNDED
+  DEDUCTED_FROM_DEPOSIT
+}
+
+enum PaymentMethod {
+  BANK_TRANSFER
+  MADA
+  CREDIT_CARD
+  MANUAL_ADMIN_CONFIRMATION
+}
+
+enum DispatchStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  ON_THE_WAY
+  DELIVERED
+}
+
+enum NotificationChannel {
+  WHATSAPP
+  SMS
+  EMAIL
+  IN_APP
+}
+
+enum NotificationType {
+  NEW_REQUEST_TO_ADMIN
+  QUOTE_SENT_TO_CUSTOMER
+  CUSTOMER_APPROVED_QUOTE
+  PAYMENT_REMINDER
+  SUPPLIER_ASSIGNMENT
+  DISPATCH_UPDATE
+  DELIVERY_CONFIRMATION
+  RENTAL_ENDING_SOON
+  LATE_RETURN_WARNING
+  DISPUTE_OPENED
+}
+
+enum NotificationStatus {
+  PENDING
+  MOCK_SENT
+  SENT
+  FAILED
+}
+
+enum DisputeReason {
+  DAMAGE
+  LATE_RETURN
+  NON_PAYMENT
+  WRONG_EQUIPMENT
+  SITE_ACCESS_ISSUE
+  OPERATOR_ISSUE
+  CANCELLATION
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  AWAITING_PAYMENT
+  RESOLVED
+  ESCALATED_LEGAL
+}
+
+enum AuditAction {
+  USER_LOGIN
+  REGISTRATION
+  EQUIPMENT_ADDED
+  EQUIPMENT_APPROVED
+  QUOTE_CREATED
+  QUOTE_APPROVED
+  CONTRACT_GENERATED
+  PAYMENT_CONFIRMED
+  HANDOVER_SIGNED
+  RETURN_SIGNED
+  DISPUTE_OPENED
+  ADMIN_STATUS_CHANGE
+}
+
+enum LegalDocumentType {
+  TERMS_AND_CONDITIONS
+  PRIVACY_POLICY
+  CUSTOMER_AGREEMENT
+  SUPPLIER_AGREEMENT
+  EQUIPMENT_RENTAL_CONTRACT
+  CANCELLATION_POLICY
+  LATE_FEES_POLICY
+  DAMAGE_POLICY
+  DEPOSIT_POLICY
+  DISPUTE_POLICY
+  DISCLAIMER
+  HANDOVER_FORM
+  RETURN_FORM
+  DAMAGE_REPORT
+}
+
+enum LegalDocumentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model User {
+  id                   String               @id @default(cuid())
+  email                String               @unique
+  mobile               String               @unique
+  passwordHash         String
+  fullName             String
+  role                 UserRole
+  trustLevel           TrustLevel           @default(NEW)
+  isActive             Boolean              @default(true)
+  termsAcceptedAt      DateTime?
+  lastLoginAt          DateTime?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  customerProfile      CustomerProfile?
+  supplierProfile      SupplierProfile?
+  driver               Driver?
+  uploadedFiles        UploadedFile[]
+  notifications        Notification[]
+  auditLogs            AuditLog[]
+  ratingsGiven         Rating[]             @relation("RatingsGiven")
+  ratingsReceived      Rating[]             @relation("RatingsReceived")
+  legalDocumentsEdited LegalDocument[]
+  legalAcceptances     LegalAcceptanceLog[]
+}
+
+model CustomerProfile {
+  id                           String          @id @default(cuid())
+  userId                       String          @unique
+  user                         User            @relation(fields: [userId], references: [id])
+  nationalIdOrIqama            String?
+  companyName                  String
+  commercialRegistrationNumber String
+  vatNumber                    String?
+  city                         String
+  address                      String
+  authorizedPersonName         String
+  crDocumentId                 String?
+  vatCertificateId             String?
+  reviewStatus                 ReviewStatus    @default(PENDING)
+  paymentReliability           Int             @default(50)
+  returnCompliance             Int             @default(50)
+  damageHistoryCount           Int             @default(0)
+  cancellationRate             Float           @default(0)
+  responseSpeed                Int             @default(50)
+  createdAt                    DateTime        @default(now())
+  requests                     RentalRequest[]
+  orders                       RentalOrder[]
+}
+
+model SupplierProfile {
+  id                       String        @id @default(cuid())
+  userId                   String        @unique
+  user                     User          @relation(fields: [userId], references: [id])
+  ownerName                String
+  companyName              String
+  commercialNumber         String
+  vatNumber                String
+  city                     String
+  coverageAreas            String[]
+  preliminaryEquipmentList Json?
+  bankIban                 String
+  crDocumentId             String?
+  vatCertificateId         String?
+  authorizationLetterId    String?
+  reviewStatus             ReviewStatus  @default(PENDING)
+  approvedAt               DateTime?
+  createdAt                DateTime      @default(now())
+  equipment                Equipment[]
+  orders                   RentalOrder[]
+  drivers                  Driver[]
+}
+
+model Equipment {
+  id                     String              @id @default(cuid())
+  supplierId             String
+  supplier               SupplierProfile     @relation(fields: [supplierId], references: [id])
+  categoryId             String?
+  catalogCategory        EquipmentCategory?  @relation(fields: [categoryId], references: [id])
+  typeId                 String?
+  catalogType            EquipmentType?      @relation(fields: [typeId], references: [id])
+  category               String
+  typeName               String?
+  specifications         Json?
+  brand                  String
+  model                  String
+  year                   Int
+  capacity               String
+  plateOrSerialNumber    String              @unique
+  city                   String
+  currentLocation        String
+  condition              String
+  fuelType               String
+  hourMeterReading       Int
+  gpsInstalled           Boolean             @default(false)
+  insuranceExpiryDate    DateTime
+  inspectionExpiryDate   DateTime
+  dailyPrice             Decimal             @db.Decimal(12, 2)
+  weeklyPrice            Decimal?            @db.Decimal(12, 2)
+  monthlyPrice           Decimal?            @db.Decimal(12, 2)
+  hourlyPrice            Decimal?            @db.Decimal(12, 2)
+  operatorIncluded       Boolean             @default(false)
+  transportationIncluded Boolean             @default(false)
+  depositRequired        Decimal             @db.Decimal(12, 2)
+  minimumRentalPeriod    String
+  available              Boolean             @default(true)
+  status                 EquipmentStatus     @default(PENDING_REVIEW)
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
+  documents              EquipmentDocument[]
+  quoteItems             QuoteItem[]
+  orders                 RentalOrder[]
+}
+
+model EquipmentCategory {
+  id           String          @id @default(cuid())
+  slug         String          @unique
+  arabicName   String
+  englishName  String
+  description  String?
+  iconName     String
+  defaultImage String
+  sortOrder    Int             @default(0)
+  isActive     Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  types        EquipmentType[]
+  equipment    Equipment[]
+}
+
+model EquipmentType {
+  id            String            @id @default(cuid())
+  categoryId    String
+  category      EquipmentCategory @relation(fields: [categoryId], references: [id])
+  slug          String            @unique
+  arabicName    String
+  englishName   String
+  capacityLabel String?
+  capacityValue Float?
+  capacityUnit  String?
+  specFields    Json
+  defaultSpecs  Json?
+  defaultImage  String?
+  seoTitle      String
+  isActive      Boolean           @default(true)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  equipment     Equipment[]
+
+  @@index([categoryId, isActive])
+}
+
+model EquipmentDocument {
+  id          String       @id @default(cuid())
+  equipmentId String
+  equipment   Equipment    @relation(fields: [equipmentId], references: [id])
+  fileId      String
+  file        UploadedFile @relation(fields: [fileId], references: [id])
+  type        String
+  expiresAt   DateTime?
+  createdAt   DateTime     @default(now())
+}
+
+model EquipmentPhoto {
+  id          String   @id @default(cuid())
+  equipmentId String
+  url         String
+  title       String?
+  type        String   @default("EQUIPMENT")
+  uploadedBy  String?
+  createdAt   DateTime @default(now())
+
+  @@index([equipmentId])
+}
+
+model RentalRequest {
+  id                   String              @id @default(cuid())
+  customerId           String
+  customer             CustomerProfile     @relation(fields: [customerId], references: [id])
+  category             String
+  workType             String?
+  equipmentType        String?
+  city                 String
+  fromCity             String?
+  toCity               String?
+  siteLocation         String
+  gpsCoordinates       String?
+  distanceEstimateKm   Float?
+  startAt              DateTime
+  durationDays         Int
+  projectDetails       String
+  operatorRequired     Boolean
+  transportRequired    Boolean
+  attachments          String[]            @default([])
+  siteAccessDocumentId String?
+  status               RentalRequestStatus @default(NEW)
+  createdAt            DateTime            @default(now())
+  quotes               Quote[]
+  orders               RentalOrder[]
+}
+
+model SupplierOffer {
+  id                 String    @id @default(cuid())
+  rentalRequestId    String
+  supplierId         String
+  equipmentId        String?
+  status             String    @default("SENT")
+  priceAmount        Decimal   @db.Decimal(12, 2)
+  pricingType        String
+  arrivalTime        String?
+  transportCost      Decimal?  @db.Decimal(12, 2)
+  extraHourRate      Decimal?  @db.Decimal(12, 2)
+  waitingFee         Decimal?  @db.Decimal(12, 2)
+  fuelResponsibility String?
+  terms              String?
+  rejectedReason     String?
+  acceptedAt         DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([rentalRequestId, supplierId])
+}
+
+model OperationOrder {
+  id                 String    @id @default(cuid())
+  rentalRequestId    String
+  supplierOfferId    String?
+  customerId         String
+  supplierId         String
+  equipmentId        String?
+  orderNumber        String    @unique
+  status             String    @default("AWAITING_SUPPLIER_ACCEPTANCE")
+  city               String
+  siteLocation       String
+  gpsCoordinates     String?
+  startAt            DateTime
+  durationLabel      String
+  dailyHours         Int?
+  priceAmount        Decimal   @db.Decimal(12, 2)
+  pricingType        String
+  transportCost      Decimal   @default(0) @db.Decimal(12, 2)
+  fuelResponsibility String?
+  extraHourRate      Decimal?  @db.Decimal(12, 2)
+  waitingFee         Decimal?  @db.Decimal(12, 2)
+  vatAmount          Decimal   @default(0) @db.Decimal(12, 2)
+  commissionPercent  Float     @default(10)
+  commissionAmount   Decimal   @default(0) @db.Decimal(12, 2)
+  supplierNet        Decimal   @default(0) @db.Decimal(12, 2)
+  customerAcceptedAt DateTime?
+  supplierAcceptedAt DateTime?
+  pdfFileId          String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([rentalRequestId, supplierId, status])
+}
+
+model PaymentRecord {
+  id               String    @id @default(cuid())
+  operationOrderId String?
+  rentalOrderId    String?
+  amount           Decimal   @db.Decimal(12, 2)
+  method           String
+  status           String    @default("PENDING_ADMIN_CONFIRMATION")
+  transferRef      String?
+  proofFileId      String?
+  confirmedById    String?
+  confirmedAt      DateTime?
+  notes            String?
+  createdAt        DateTime  @default(now())
+
+  @@index([operationOrderId, rentalOrderId, status])
+}
+
+model FleetStatus {
+  id                   String    @id @default(cuid())
+  supplierId           String
+  equipmentId          String?
+  equipmentName        String
+  status               String
+  hourMeterReading     Int?
+  plateNumber          String?
+  inspectionExpiryDate DateTime?
+  insuranceExpiryDate  DateTime?
+  lastServiceNote      String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([supplierId, status])
+}
+
+model SupplierSubscription {
+  id         String    @id @default(cuid())
+  supplierId String
+  plan       String    @default("FREE")
+  status     String    @default("ACTIVE")
+  startedAt  DateTime  @default(now())
+  expiresAt  DateTime?
+  notes      String?
+
+  @@index([supplierId, plan, status])
+}
+
+model Quote {
+  id                 String        @id @default(cuid())
+  rentalRequestId    String
+  rentalRequest      RentalRequest @relation(fields: [rentalRequestId], references: [id])
+  status             QuoteStatus   @default(DRAFT)
+  rentalDurationDays Int
+  equipmentPrice     Decimal       @db.Decimal(12, 2)
+  transportCost      Decimal       @db.Decimal(12, 2)
+  operatorCost       Decimal       @db.Decimal(12, 2)
+  deposit            Decimal       @db.Decimal(12, 2)
+  platformFee        Decimal       @db.Decimal(12, 2)
+  vat                Decimal       @db.Decimal(12, 2)
+  totalPayable       Decimal       @db.Decimal(12, 2)
+  paymentTerms       String
+  validUntil         DateTime
+  pdfFileId          String?
+  approvedAt         DateTime?
+  createdAt          DateTime      @default(now())
+  items              QuoteItem[]
+  order              RentalOrder?
+}
+
+model QuoteItem {
+  id          String    @id @default(cuid())
+  quoteId     String
+  quote       Quote     @relation(fields: [quoteId], references: [id])
+  equipmentId String
+  equipment   Equipment @relation(fields: [equipmentId], references: [id])
+  description String
+  quantity    Int       @default(1)
+  unitPrice   Decimal   @db.Decimal(12, 2)
+  total       Decimal   @db.Decimal(12, 2)
+}
+
+model RentalOrder {
+  id               String               @id @default(cuid())
+  rentalRequestId  String
+  rentalRequest    RentalRequest        @relation(fields: [rentalRequestId], references: [id])
+  quoteId          String               @unique
+  quote            Quote                @relation(fields: [quoteId], references: [id])
+  customerId       String
+  customer         CustomerProfile      @relation(fields: [customerId], references: [id])
+  supplierId       String
+  supplier         SupplierProfile      @relation(fields: [supplierId], references: [id])
+  equipmentId      String
+  equipment        Equipment            @relation(fields: [equipmentId], references: [id])
+  status           RentalRequestStatus  @default(CONFIRMED)
+  paymentStatus    PaymentStatus        @default(UNPAID)
+  startAt          DateTime
+  endAt            DateTime
+  location         String
+  createdAt        DateTime             @default(now())
+  contracts        Contract[]
+  handoverReports  HandoverReport[]
+  returnReports    ReturnReport[]
+  payments         Payment[]
+  deposits         Deposit[]
+  dispatches       Dispatch[]
+  disputes         Dispute[]
+  legalAcceptances LegalAcceptanceLog[]
+}
+
+model Contract {
+  id                   String               @id @default(cuid())
+  orderId              String?
+  order                RentalOrder?         @relation(fields: [orderId], references: [id])
+  type                 ContractType
+  status               ContractStatus       @default(DRAFT)
+  title                String
+  body                 String
+  pdfFileId            String?
+  legalDocumentVersion String?
+  digitalAccepted      Boolean              @default(false)
+  acceptedByTypedName  String?
+  acceptedAt           DateTime?
+  ipAddressPlaceholder String?
+  attachmentsList      String[]
+  createdAt            DateTime             @default(now())
+  legalAcceptances     LegalAcceptanceLog[]
+}
+
+model HandoverReport {
+  id                 String      @id @default(cuid())
+  orderId            String
+  order              RentalOrder @relation(fields: [orderId], references: [id])
+  photos             String[]
+  videoFileId        String?
+  hourMeterReading   Int
+  fuelLevel          String
+  equipmentCondition String
+  customerSigned     Boolean     @default(false)
+  typedName          String?
+  signedAt           DateTime?
+  createdAt          DateTime    @default(now())
+}
+
+model ReturnReport {
+  id                 String      @id @default(cuid())
+  orderId            String
+  order              RentalOrder @relation(fields: [orderId], references: [id])
+  photos             String[]
+  hourMeterReading   Int
+  fuelLevel          String
+  equipmentCondition String
+  damageFound        Boolean     @default(false)
+  comparisonNotes    String
+  customerSigned     Boolean     @default(false)
+  typedName          String?
+  signedAt           DateTime?
+  createdAt          DateTime    @default(now())
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  orderId       String
+  order         RentalOrder   @relation(fields: [orderId], references: [id])
+  amount        Decimal       @db.Decimal(12, 2)
+  method        PaymentMethod
+  status        PaymentStatus
+  receiptFileId String?
+  confirmedById String?
+  confirmedAt   DateTime?
+  notes         String?
+  createdAt     DateTime      @default(now())
+}
+
+model Deposit {
+  id              String        @id @default(cuid())
+  orderId         String
+  order           RentalOrder   @relation(fields: [orderId], references: [id])
+  amount          Decimal       @db.Decimal(12, 2)
+  status          PaymentStatus @default(UNPAID)
+  deductionAmount Decimal?      @db.Decimal(12, 2)
+  refundAmount    Decimal?      @db.Decimal(12, 2)
+  notes           String?
+}
+
+model Dispatch {
+  id           String         @id @default(cuid())
+  orderId      String
+  order        RentalOrder    @relation(fields: [orderId], references: [id])
+  driverId     String?
+  driver       Driver?        @relation(fields: [driverId], references: [id])
+  status       DispatchStatus @default(PENDING)
+  rejectReason String?
+  dispatchTime DateTime?
+  truckPlate   String?
+  driverMobile String?
+  deliveredAt  DateTime?
+  createdAt    DateTime       @default(now())
+}
+
+model Driver {
+  id          String          @id @default(cuid())
+  userId      String?         @unique
+  user        User?           @relation(fields: [userId], references: [id])
+  supplierId  String
+  supplier    SupplierProfile @relation(fields: [supplierId], references: [id])
+  name        String
+  mobile      String
+  iqamaNumber String?
+  licenseType String?
+  isActive    Boolean         @default(true)
+  dispatches  Dispatch[]
+}
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String?
+  user      User?               @relation(fields: [userId], references: [id])
+  type      NotificationType
+  channel   NotificationChannel
+  status    NotificationStatus  @default(PENDING)
+  title     String
+  body      String
+  payload   Json?
+  sentAt    DateTime?
+  createdAt DateTime            @default(now())
+}
+
+model Dispute {
+  id            String        @id @default(cuid())
+  orderId       String
+  order         RentalOrder   @relation(fields: [orderId], references: [id])
+  reason        DisputeReason
+  status        DisputeStatus @default(OPEN)
+  evidenceFiles String[]
+  adminNotes    String?
+  supplierNotes String?
+  customerNotes String?
+  openedAt      DateTime      @default(now())
+  resolvedAt    DateTime?
+}
+
+model Rating {
+  id                 String   @id @default(cuid())
+  orderId            String
+  fromUserId         String
+  fromUser           User     @relation("RatingsGiven", fields: [fromUserId], references: [id])
+  toUserId           String
+  toUser             User     @relation("RatingsReceived", fields: [toUserId], references: [id])
+  score              Int
+  notes              String?
+  paymentReliability Int?
+  returnCompliance   Int?
+  damageHistory      Int?
+  cancellationRate   Float?
+  responseSpeed      Int?
+  createdAt          DateTime @default(now())
+}
+
+model AuditLog {
+  id        String      @id @default(cuid())
+  userId    String?
+  user      User?       @relation(fields: [userId], references: [id])
+  action    AuditAction
+  entity    String
+  entityId  String?
+  ipAddress String?
+  metadata  Json?
+  createdAt DateTime    @default(now())
+}
+
+model LegalDocument {
+  id          String               @id @default(cuid())
+  type        LegalDocumentType
+  title       String
+  version     String
+  status      LegalDocumentStatus  @default(DRAFT)
+  body        String
+  issuedAt    DateTime
+  publishedAt DateTime?
+  editedById  String?
+  editedBy    User?                @relation(fields: [editedById], references: [id])
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  acceptances LegalAcceptanceLog[]
+
+  @@unique([type, version])
+}
+
+model LegalDocumentTemplate {
+  id              String   @id @default(cuid())
+  documentType    String
+  arabicName      String
+  englishName     String
+  templateContent String
+  version         String
+  isPublished     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([documentType, version])
+  @@index([documentType, isPublished])
+}
+
+model GeneratedDocument {
+  id              String    @id @default(cuid())
+  documentType    String
+  orderId         String?
+  customerId      String?
+  supplierId      String?
+  generatedPdfUrl String
+  generatedHtml   String
+  acceptedAt      DateTime?
+  signedBy        String?
+  ipAddress       String?
+  userAgent       String?
+  status          String    @default("DRAFT")
+  createdAt       DateTime  @default(now())
+
+  @@index([documentType, orderId])
+}
+
+model LegalAcceptanceLog {
+  id              String            @id @default(cuid())
+  userId          String
+  user            User              @relation(fields: [userId], references: [id])
+  documentId      String
+  document        LegalDocument     @relation(fields: [documentId], references: [id])
+  documentType    LegalDocumentType
+  documentVersion String
+  relatedOrderId  String?
+  relatedOrder    RentalOrder?      @relation(fields: [relatedOrderId], references: [id])
+  contractId      String?
+  contract        Contract?         @relation(fields: [contractId], references: [id])
+  acceptedAt      DateTime          @default(now())
+  ipAddress       String
+  typedFullName   String
+  nationalIdOrCr  String
+  userAgent       String?
+
+  @@index([userId, documentType, relatedOrderId])
+}
+
+model UploadedFile {
+  id                 String              @id @default(cuid())
+  ownerId            String?
+  owner              User?               @relation(fields: [ownerId], references: [id])
+  originalName       String
+  storagePath        String
+  mimeType           String
+  sizeBytes          Int
+  checksum           String?
+  createdAt          DateTime            @default(now())
+  equipmentDocuments EquipmentDocument[]
+}
+
+model PlatformSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+}

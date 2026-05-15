@@ -1,0 +1,16 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#0B1F3A"/>
+  <path d="M0 520H1200" stroke="#C89B3C" stroke-width="12"/>
+  <rect x="78" y="78" width="170" height="170" rx="32" fill="#102A4C" stroke="#C89B3C" stroke-width="6"/>
+  <path d="M104 194H222" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round"/>
+  <path d="M120 182H162L184 148H216L228 182H120Z" fill="#C89B3C"/>
+  <path d="M125 130H205" stroke="#C89B3C" stroke-width="9" stroke-linecap="round"/>
+  <path d="M137 130L164 105L194 130" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="138" cy="194" r="10" fill="#0B1F3A" stroke="#FFFFFF" stroke-width="5"/>
+  <circle cx="201" cy="194" r="10" fill="#0B1F3A" stroke="#FFFFFF" stroke-width="5"/>
+  <text x="1080" y="165" fill="#FFFFFF" font-size="72" font-weight="800" font-family="Arial, Tahoma, sans-serif" text-anchor="end">فليت معدات</text>
+  <text x="1080" y="225" fill="#C89B3C" font-size="34" font-weight="700" font-family="Arial, Tahoma, sans-serif" text-anchor="end">Fleet Equipment</text>
+  <text x="1080" y="315" fill="#FFFFFF" font-size="42" font-weight="700" font-family="Arial, Tahoma, sans-serif" text-anchor="end">تأجير المعدات وإدارة الأساطيل</text>
+  <text x="1080" y="374" fill="#DDE6F2" font-size="28" font-family="Arial, Tahoma, sans-serif" text-anchor="end">عقود رقمية · تشغيل متكامل · سوق سعودي موثوق</text>
+  <text x="1080" y="472" fill="#C89B3C" font-size="26" font-weight="700" font-family="Arial, Tahoma, sans-serif" text-anchor="end">fleetequipment.sa · fleet-equipment.com</text>
+</svg>
