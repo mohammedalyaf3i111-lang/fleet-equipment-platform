@@ -12,13 +12,24 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 body {
   margin: 0;
+  overflow-x: hidden;
+  max-width: 100%;
   background: #f4f6f8;
   color: #122033;
   font-family: Arial, "Tahoma", sans-serif;
+}
+
+/* Prevent any child from blowing out horizontal layout */
+*,
+*::before,
+*::after {
+  min-width: 0;
 }
 
 a {

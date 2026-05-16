@@ -28,11 +28,11 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-mist">
       <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/95 shadow-sm shadow-slate-900/5 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2 sm:px-6 sm:py-3.5 lg:px-8">
           <Link href="/" className="flex shrink-0 items-center gap-3.5">
-            <Image src="/logo.svg" alt={t("brand.name")} width={56} height={56} priority className="h-14 w-14" />
+            <Image src="/logo.svg" alt={t("brand.name")} width={56} height={56} priority className="h-10 w-10 sm:h-14 sm:w-14" />
             <span>
-              <span className="flex items-center gap-2 text-xl font-black leading-tight text-navy">
+              <span className="flex items-center gap-2 text-base font-black leading-tight text-navy sm:text-xl">
                 {t("brand.name")}
                 <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/60 bg-amber-50 px-2 py-0.5 text-[10px] font-black text-amber-700">
                   <FlaskConical className="h-2.5 w-2.5" />
@@ -91,10 +91,10 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* ── Beta notice banner ─────────────────────────────────────────────── */}
-      <div className="flex items-center justify-center gap-2 border-b border-amber-200 bg-amber-50 px-4 py-2 text-center text-xs font-bold text-amber-800">
-        <FlaskConical className="h-3.5 w-3.5 shrink-0" />
-        <span>
-          فليت معدات — نسخة تجريبية Beta · هذه نسخة تجريبية، بعض الخدمات قيد الاختبار والتفعيل.
+      <div className="flex items-center justify-center gap-1.5 border-b border-amber-200 bg-amber-50 px-3 py-1 text-center text-[11px] font-bold text-amber-800 sm:gap-2 sm:px-4 sm:py-2 sm:text-xs">
+        <FlaskConical className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" />
+        <span className="truncate">
+          <span className="hidden sm:inline">فليت معدات — </span>نسخة تجريبية Beta<span className="hidden sm:inline"> · هذه نسخة تجريبية، بعض الخدمات قيد الاختبار والتفعيل.</span>
         </span>
       </div>
 
