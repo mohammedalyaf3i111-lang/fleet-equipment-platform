@@ -34,25 +34,39 @@ export const equipmentFilterSchemas: Record<string, EquipmentFilterSchema> = {
     slug: "grader",
     title: "جريدر",
     typeLabel: "موديل الجريدر",
-    defaultTypeSlug: "grader-140",
+    defaultTypeSlug: "cat-140-m3",
     typeOptions: [
-      { slug: "grader-120", arabicName: "Grader 120" },
-      { slug: "grader-140", arabicName: "Grader 140" },
-      { slug: "grader-160", arabicName: "Grader 160" },
-      { slug: "grader-14m", arabicName: "Grader 14M" },
-      { slug: "grader-16m", arabicName: "Grader 16M" },
-      { slug: "grader-24m", arabicName: "Grader 24M" }
+      { slug: "cat-120-m3", arabicName: "CAT 120 M3" },
+      { slug: "cat-140-m3", arabicName: "CAT 140 M3" },
+      { slug: "cat-160-m3", arabicName: "CAT 160 M3" },
+      { slug: "cat-14m3", arabicName: "CAT 14M3" },
+      { slug: "cat-16m3", arabicName: "CAT 16M3" },
+      { slug: "cat-24m", arabicName: "CAT 24M" },
+      { slug: "komatsu-gd405", arabicName: "Komatsu GD405A" },
+      { slug: "komatsu-gd555", arabicName: "Komatsu GD555A" },
+      { slug: "komatsu-gd655", arabicName: "Komatsu GD655A" },
+      { slug: "volvo-g930", arabicName: "Volvo G930" },
+      { slug: "volvo-g940", arabicName: "Volvo G940" },
+      { slug: "john-deere-672g", arabicName: "John Deere 672G" },
+      { slug: "case-865b", arabicName: "CASE 865B" },
+      { slug: "sdlg-gr215", arabicName: "SDLG GR215" },
+      { slug: "xcmg-gr215", arabicName: "XCMG GR215" }
     ],
     fields: [
-      { key: "city", label: "المدينة", type: "city" },
-      { key: "horsepower", label: "القدرة الحصانية", type: "number", placeholder: "مثال: 180 حصان" },
-      { key: "bladeWidth", label: "عرض الشفرة", type: "text", placeholder: "مثال: 3.7 متر" },
+      { key: "city", label: "المدينة / الموقع", type: "city" },
+      { key: "brand", label: "الماركة", type: "select", options: ["CAT", "Komatsu", "Volvo", "John Deere", "CASE", "SDLG", "XCMG"] },
+      { key: "bladeWidth", label: "عرض الشفرة", type: "select", options: ["أقل من 3.5 متر", "3.5 – 3.7 متر", "3.7 – 4.0 متر", "أكثر من 4.0 متر"] },
+      { key: "horsepower", label: "القدرة الحصانية", type: "select", options: ["حتى 120 HP", "120 – 160 HP", "160 – 200 HP", "200 – 250 HP", "أكثر من 250 HP"] },
+      { key: "operatingWeight", label: "الوزن التشغيلي", type: "select", options: ["حتى 12 طن", "12 – 15 طن", "15 – 20 طن", "أكثر من 20 طن"] },
       { key: "year", label: "سنة الصنع", type: "number", placeholder: "مثال: 2020" },
+      { key: "rentalDuration", label: "مدة الإيجار", type: "select", options: ["يومي", "أسبوعي", "شهري", "ربع سنوي"] },
+      { key: "articulatedFrame", label: "هيكل مفصلي", type: "boolean" },
+      { key: "ripperAvailable", label: "ريبر متوفر", type: "boolean" },
+      { key: "gpsReady", label: "GPS جاهز", type: "boolean" },
       { key: "withOperator", label: "مع مشغل", type: "boolean" },
-      { key: "dailyRate", label: "سعر اليوم", type: "number", placeholder: "حتى 2500 ر.س" },
-      ...commonAvailability
+      { key: "availableNow", label: "متوفر الآن", type: "boolean" }
     ],
-    resultKeywords: ["جريدر", "Grader"]
+    resultKeywords: ["جريدر", "Grader", "موتور جريدر"]
   },
   cranes: {
     slug: "cranes",
