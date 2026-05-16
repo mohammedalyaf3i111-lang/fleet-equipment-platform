@@ -234,6 +234,34 @@ export const equipmentFilterSchemas: Record<string, EquipmentFilterSchema> = {
     ],
     resultKeywords: ["رافعات شوكية", "فوركلفت"]
   },
+  "boom-lifts-manlifts": {
+    slug: "boom-lifts-manlifts",
+    title: "مان لفت / بوم لفت",
+    typeLabel: "نوع المنصة",
+    defaultTypeSlug: "manlift-40ft",
+    typeOptions: [
+      { slug: "manlift-20ft", arabicName: "مان لفت 20 قدم" },
+      { slug: "manlift-40ft", arabicName: "مان لفت 40 قدم" },
+      { slug: "manlift-60ft", arabicName: "مان لفت 60 قدم" },
+      { slug: "manlift-80ft", arabicName: "مان لفت 80 قدم" },
+      { slug: "boom-lift-60ft", arabicName: "بوم لفت 60 قدم" },
+      { slug: "boom-lift-80ft", arabicName: "بوم لفت 80 قدم" },
+      { slug: "boom-lift-120ft", arabicName: "بوم لفت 120 قدم" },
+      { slug: "articulated-boom", arabicName: "بوم مفصلي" },
+      { slug: "telescopic-boom", arabicName: "بوم تلسكوبي" }
+    ],
+    fields: [
+      { key: "city", label: "المدينة", type: "city" },
+      { key: "liftType", label: "نوع المنصة", type: "select", options: ["مان لفت عمودي", "بوم لفت مفصلي", "بوم لفت تلسكوبي", "مقص"] },
+      { key: "workingHeight", label: "ارتفاع العمل", type: "select", options: ["حتى 10 م", "10 – 15 م", "15 – 20 م", "20 – 30 م", "أكثر من 30 م"] },
+      { key: "powerSource", label: "مصدر الطاقة", type: "select", options: ["كهربائي", "ديزل", "هجين"] },
+      { key: "platformCapacity", label: "سعة المنصة", type: "select", options: ["شخص واحد", "شخصان", "أكثر من شخصين"] },
+      { key: "indoor", label: "استخدام داخلي", type: "boolean" },
+      { key: "withOperator", label: "مع مشغل", type: "boolean" },
+      { key: "availableNow", label: "متوفر الآن", type: "boolean" }
+    ],
+    resultKeywords: ["مان لفت", "بوم لفت", "سلة رفع"]
+  },
   "compressors-generators": {
     slug: "compressors-generators",
     title: "مولدات",
@@ -264,7 +292,9 @@ const aliases: Record<string, string> = {
   generators: "compressors-generators",
   "dump-trucks": "trucks",
   lowbeds: "trucks",
-  "road-equipment": "grader"
+  "road-equipment": "grader",
+  manlifts: "boom-lifts-manlifts",
+  "boom-lifts": "boom-lifts-manlifts"
 };
 
 export function getEquipmentFilterSchema(slug?: string) {
