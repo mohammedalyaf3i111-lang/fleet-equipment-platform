@@ -14,15 +14,30 @@ import { findServiceCategory } from "@/lib/service-categories";
 import { brand } from "@/lib/brand";
 import type { Metadata } from "next";
 
+// Private path prefixes — get noindex, nofollow
+const PRIVATE_PREFIXES = ["admin", "supplier", "customer", "login", "register", "launch-checklist", "legal/document"];
+
 export async function generateMetadata({ params }: { params: Promise<{ slug?: string[] }> }): Promise<Metadata> {
   const resolved = await params;
   const slug = resolved.slug ?? [];
+  const path = slug.join("/");
+
+  // noindex for all private/dashboard pages
+  const isPrivate = PRIVATE_PREFIXES.some(p => path === p || path.startsWith(p + "/"));
+  if (isPrivate) {
+    return {
+      robots: { index: false, follow: false, googleBot: { index: false, follow: false } }
+    };
+  }
+
+  // Service pages
   if (slug[0] === "services" && slug[1]) {
     const service = findServiceCategory(slug[1]);
     if (service) {
       return {
         title: service.seoTitle,
         description: service.seoDescription,
+        robots: { index: true, follow: true },
         openGraph: {
           title: service.seoTitle,
           description: service.seoDescription,
@@ -34,6 +49,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug?: st
       };
     }
   }
+
+  // Equipment category pages
+  if (slug[0] === "equipment" && slug[1]) {
+    const cat = slug[1];
+    const title = `تأجير ${cat} — فليت معدات`;
+    const description = `اعثر على أفضل ${cat} معتمدة للتأجير في السعودية مع فلاتر مخصصة وأسعار شفافة.`;
+    return {
+      title,
+      description,
+      robots: { index: true, follow: true },
+      openGraph: { title, description, siteName: brand.arabicName, locale: "ar_SA", type: "website" }
+    };
+  }
+
   return {};
 }
 

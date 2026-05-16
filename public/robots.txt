@@ -1,0 +1,32 @@
+User-agent: *
+
+# ── Allow public pages ──────────────────────────────────────────────────────
+Allow: /$
+Allow: /equipment
+Allow: /equipment/
+Allow: /services
+Allow: /services/
+Allow: /about
+Allow: /contact
+Allow: /terms
+Allow: /privacy
+Allow: /become-supplier
+Allow: /request-equipment
+
+# ── Disallow private / dashboard / API ──────────────────────────────────────
+Disallow: /admin
+Disallow: /admin/
+Disallow: /supplier
+Disallow: /supplier/
+Disallow: /customer
+Disallow: /customer/
+Disallow: /api
+Disallow: /api/
+Disallow: /login
+Disallow: /register
+Disallow: /register/
+Disallow: /launch-checklist
+Disallow: /legal/document/
+
+# ── Sitemap ──────────────────────────────────────────────────────────────────
+Sitemap: https://fleetequipment.sa/sitemap.xml

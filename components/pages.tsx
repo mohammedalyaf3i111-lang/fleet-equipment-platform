@@ -721,6 +721,9 @@ function DashboardLayout({ role, section, page }: { role: "customer" | "supplier
       <div className="grid min-h-screen lg:grid-cols-[280px_1fr]">
         <aside className="border-l border-slate-200 bg-navy p-5 text-white">
           <Link href="/" className="text-2xl font-black text-gold">{brand.arabicName}</Link>
+          <span className="mt-1 inline-flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-400/10 px-2.5 py-0.5 text-[10px] font-black text-amber-400">
+            نسخة تجريبية Beta
+          </span>
           <nav className="mt-8 grid gap-2">
             {menu.map(([label, href]) => (
               <Link key={href} href={href} className="rounded-md px-3 py-2 text-sm font-bold text-white/75 hover:bg-white/10 hover:text-white">

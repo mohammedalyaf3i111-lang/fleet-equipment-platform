@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { Menu, X, ShieldCheck, Twitter, Linkedin, Instagram } from "lucide-react";
+import { Menu, X, ShieldCheck, Twitter, Linkedin, Instagram, FlaskConical } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ButtonLink } from "@/components/ui";
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -32,7 +32,13 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
           <Link href="/" className="flex shrink-0 items-center gap-3.5">
             <Image src="/logo.svg" alt={t("brand.name")} width={56} height={56} priority className="h-14 w-14" />
             <span>
-              <span className="block text-xl font-black leading-tight text-navy">{t("brand.name")}</span>
+              <span className="flex items-center gap-2 text-xl font-black leading-tight text-navy">
+                {t("brand.name")}
+                <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/60 bg-amber-50 px-2 py-0.5 text-[10px] font-black text-amber-700">
+                  <FlaskConical className="h-2.5 w-2.5" />
+                  Beta
+                </span>
+              </span>
               <span className="block text-xs font-semibold text-steel">{t("brand.englishName")}</span>
             </span>
           </Link>
@@ -83,6 +89,15 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
           </div>
         )}
       </header>
+
+      {/* ── Beta notice banner ─────────────────────────────────────────────── */}
+      <div className="flex items-center justify-center gap-2 border-b border-amber-200 bg-amber-50 px-4 py-2 text-center text-xs font-bold text-amber-800">
+        <FlaskConical className="h-3.5 w-3.5 shrink-0" />
+        <span>
+          فليت معدات — نسخة تجريبية Beta · هذه نسخة تجريبية، بعض الخدمات قيد الاختبار والتفعيل.
+        </span>
+      </div>
+
       {children}
       <a href={officialWhatsAppLink} target="_blank" rel="noreferrer" className="fixed bottom-5 right-5 z-50 rounded-full bg-[#25D366] px-5 py-3 text-sm font-black text-white shadow-2xl shadow-slate-900/25 transition hover:-translate-y-0.5 hover:bg-[#1ebe5d] ltr:left-5 ltr:right-auto">
         {t("actions.whatsapp")}
@@ -151,8 +166,14 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
           </div>
           <div className="mt-12 border-t border-white/10 py-6">
             <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-white/45">
-              <p>©2025 {brand.arabicName} - {brand.legalOwner} - جميع الحقوق محفوظة - حقوق محفوظة</p>
-              <p>{brand.primaryDomain} - {brand.globalDomain}</p>
+              <p>©2025 {brand.arabicName} - {brand.legalOwner} - جميع الحقوق محفوظة</p>
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-400/10 px-2.5 py-1 text-[11px] font-black text-amber-400">
+                  <FlaskConical className="h-3 w-3" />
+                  نسخة تجريبية Beta
+                </span>
+                <p>{brand.primaryDomain} - {brand.globalDomain}</p>
+              </div>
             </div>
           </div>
         </div>
