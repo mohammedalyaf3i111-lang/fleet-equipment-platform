@@ -21,6 +21,7 @@ import { equipmentCatalog, findCatalogCategory, getAllEquipmentTypes } from "@/l
 import { getEquipmentFilterSchema } from "@/constants/equipmentFilterSchemas";
 import { buildGeneratedDocument, getDocumentTemplate, listGeneratedDocuments, parseGeneratedDocumentId } from "@/lib/document-engine";
 import { findServiceCategory, serviceCategories, type ServiceCategory, type ServiceFilterField } from "@/lib/service-categories";
+import { AdminEquipmentManager } from "@/components/admin-equipment-manager";
 import { BrickBlockService } from "@/components/brick-block-service";
 import { BackfillingService } from "@/components/backfilling-service";
 import { ConstructionWasteService } from "@/components/construction-waste-service";
@@ -754,6 +755,7 @@ function DashboardContent({ role, page }: { role: "customer" | "supplier" | "adm
   if (page === "legal-documents" || page === "contracts" || page === "documents") return <DocumentRegistryPanel />;
   if (page === "quotes") return <SupplierOffersPanel role={role} />;
   if (role === "supplier" && page === "equipment") return <SupplierFleetPanel />;
+  if (role === "admin" && (page === "equipment" || page === "catalog")) return <AdminEquipmentManager />;
   if (page === "equipment" || page === "catalog") return <EquipmentCatalogPanel role={role} />;
   if (role === "admin" && page === "suppliers") return <SupplierReviewPanel />;
   if (page === "payments") return <ManualPaymentsPanel />;
