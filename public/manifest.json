@@ -1,0 +1,16 @@
+{
+  "name": "فليت معدات",
+  "short_name": "فليت معدات",
+  "description": "منصة تأجير المعدات الثقيلة في المملكة العربية السعودية",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#07162a",
+  "theme_color": "#07162a",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    { "src": "/logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "categories": ["business", "productivity"],
+  "related_applications": []
+}
