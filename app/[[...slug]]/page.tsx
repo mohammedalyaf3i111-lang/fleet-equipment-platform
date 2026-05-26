@@ -10,15 +10,18 @@ import {
   ServiceCategoryPage,
   StaticPublicPage
 } from "@/components/pages";
+import { CityLandingPage, EquipmentCityPage } from "@/components/city-pages";
 import { findServiceCategory } from "@/lib/service-categories";
 import { brand } from "@/lib/brand";
+import { getCity, getCityEquipmentContent, EQUIPMENT_ARABIC_NAMES } from "@/lib/cities";
 import {
   SITE_URL,
   equipmentSeoMap,
   pageSeoMap,
   buildEquipmentPageSchema,
   buildServicePageSchema,
-  buildBreadcrumbSchema
+  buildBreadcrumbSchema,
+  buildFaqSchema
 } from "@/lib/seo";
 import type { Metadata } from "next";
 
@@ -134,6 +137,64 @@ export async function generateMetadata({ params }: { params: Promise<{ slug?: st
     }
   }
 
+  // ── City landing pages (/cities/riyadh) ──────────────────────────────────────
+  if (slug[0] === "cities" && slug[1] && !slug[2]) {
+    const city = getCity(slug[1]);
+    if (city) {
+      const title = `تأجير معدات ثقيلة في ${city.arabicName} — فليت معدات`;
+      const description = `اعثر على أفضل معدات ثقيلة للتأجير في ${city.arabicName}: كرينات، حفارات، شيولات، قلابات، مولدات وأكثر. مزودون معتمدون، عقود رقمية، أسعار شفافة. ${city.localContext}`;
+      const keywords = [
+        `تأجير معدات ${city.arabicName}`,
+        `ايجار معدات ${city.arabicName}`,
+        `معدات ثقيلة ${city.arabicName}`,
+        `تأجير كرينات ${city.arabicName}`,
+        `تأجير حفارات ${city.arabicName}`,
+        `تأجير شيولات ${city.arabicName}`,
+        `تأجير قلابات ${city.arabicName}`,
+        `تأجير مولدات ${city.arabicName}`,
+        `فليت معدات ${city.arabicName}`,
+        `heavy equipment rental ${city.englishName}`
+      ];
+      return {
+        title,
+        description,
+        keywords,
+        alternates: { canonical: `${SITE_URL}/cities/${slug[1]}` },
+        robots: { index: true, follow: true },
+        openGraph: { title, description, url: `${SITE_URL}/cities/${slug[1]}`, siteName: "فليت معدات", locale: "ar_SA", type: "website" },
+        twitter: { card: "summary_large_image", title, description }
+      };
+    }
+  }
+
+  // ── Equipment + City pages (/cities/riyadh/cranes) ────────────────────────
+  if (slug[0] === "cities" && slug[1] && slug[2]) {
+    const city = getCity(slug[1]);
+    const equipName = EQUIPMENT_ARABIC_NAMES[slug[2]] ?? slug[2];
+    if (city) {
+      const title = `تأجير ${equipName} في ${city.arabicName} — فليت معدات`;
+      const description = `استأجر ${equipName} في ${city.arabicName} بأسعار تنافسية وعقود رقمية. مزودون معتمدون، توصيل خلال 24 ساعة، مع مشغل أو بدون. ${city.description}.`;
+      const keywords = [
+        `تأجير ${equipName} ${city.arabicName}`,
+        `ايجار ${equipName} ${city.arabicName}`,
+        `${equipName} للايجار ${city.arabicName}`,
+        `${equipName} ${city.arabicName}`,
+        `تأجير معدات ${city.arabicName}`,
+        `فليت معدات ${city.arabicName}`,
+        `equipment rental ${city.englishName}`
+      ];
+      return {
+        title,
+        description,
+        keywords,
+        alternates: { canonical: `${SITE_URL}/cities/${slug[1]}/${slug[2]}` },
+        robots: { index: true, follow: true },
+        openGraph: { title, description, url: `${SITE_URL}/cities/${slug[1]}/${slug[2]}`, siteName: "فليت معدات", locale: "ar_SA", type: "website" },
+        twitter: { card: "summary_large_image", title, description }
+      };
+    }
+  }
+
   // ── Equipment category pages ─────────────────────────────────────────────────
   if (slug[0] === "equipment" && slug[1]) {
     const catSlug = slug[1];
@@ -216,6 +277,55 @@ export default async function PlatformRoute({
   if (path === "register/supplier") return <AuthPage type="supplier" />;
   if (path === "request-equipment") return <RequestEquipmentPage />;
   if (path === "launch-checklist") return <LaunchChecklistPage />;
+
+  // ── City landing page (/cities/riyadh) ───────────────────────────────────────
+  if (slug[0] === "cities" && slug[1] && !slug[2]) {
+    const city = getCity(slug[1]);
+    if (!city) return <NotFoundPage />;
+    const breadcrumb = buildBreadcrumbSchema([
+      { name: "الرئيسية", url: SITE_URL },
+      { name: `تأجير معدات في ${city.arabicName}`, url: `${SITE_URL}/cities/${slug[1]}` }
+    ]);
+    return (
+      <>
+        <JsonLd data={breadcrumb} />
+        <CityLandingPage city={city} />
+      </>
+    );
+  }
+
+  // ── Equipment + City page (/cities/riyadh/cranes) ────────────────────────────
+  if (slug[0] === "cities" && slug[1] && slug[2]) {
+    const city = getCity(slug[1]);
+    if (!city) return <NotFoundPage />;
+    const content = getCityEquipmentContent(slug[1], slug[2]);
+    if (!content) return <NotFoundPage />;
+    const equipName = EQUIPMENT_ARABIC_NAMES[slug[2]] ?? slug[2];
+    const schema = {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      name: `تأجير ${equipName} في ${city.arabicName}`,
+      description: content.intro,
+      provider: { "@id": `${SITE_URL}/#organization` },
+      areaServed: { "@type": "City", name: city.arabicName },
+      url: `${SITE_URL}/cities/${slug[1]}/${slug[2]}`,
+      offers: { "@type": "AggregateOffer", priceCurrency: "SAR", availability: "https://schema.org/InStock" }
+    };
+    const faqSchema = content.faqs.length > 0 ? buildFaqSchema(content.faqs) : null;
+    const breadcrumb = buildBreadcrumbSchema([
+      { name: "الرئيسية", url: SITE_URL },
+      { name: `معدات ${city.arabicName}`, url: `${SITE_URL}/cities/${slug[1]}` },
+      { name: `تأجير ${equipName}`, url: `${SITE_URL}/cities/${slug[1]}/${slug[2]}` }
+    ]);
+    return (
+      <>
+        <JsonLd data={schema} />
+        <JsonLd data={faqSchema} />
+        <JsonLd data={breadcrumb} />
+        <EquipmentCityPage city={city} equipmentSlug={slug[2]} content={content} />
+      </>
+    );
+  }
 
   // ── Services with JSON-LD ────────────────────────────────────────────────────
   if (slug[0] === "services" && slug[1]) {
